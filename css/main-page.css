@@ -1,0 +1,1068 @@
+/* =============================================================================
+   main-page.css — специфические стили главной страницы
+   ============================================================================= */
+
+
+/* ─── 1. Основной layout (Desktop-First) ────────────────────────────────────── */
+
+.site-main {
+  display:          grid;
+  grid-template-columns:
+    var(--zone-craft-width)
+    1fr
+    var(--zone-poetry-width);
+  height:           calc(100vh - var(--footer-height));
+  margin-top:       0;
+  overflow:         hidden;
+  position:         relative;
+}
+
+/* Нижняя зона — за пределами grid, фиксирована снизу над футером */
+.zone--projects {
+  position:        fixed;
+  bottom:          var(--footer-height);
+  left:            0;
+  width:           100vw;
+  z-index:         var(--z-projects);
+  overflow:        visible !important;
+  height:          var(--projects-height);
+}
+
+
+/* ─── 2. Интерактивные зоны (базовое состояние) ─────────────────────────────── */
+.zone {
+  will-change: opacity;
+  transition:  var(--transition-opacity);
+}
+
+/* Левая зона — Крафт */
+.zone--craft {
+  position:        fixed;
+  top:             var(--header-height);
+  left:            0;
+  width:           var(--zone-craft-width);
+  height:          calc(100vh - var(--header-height) - var(--footer-height));
+  overflow-y:      auto;
+  overflow-x:      hidden;
+  opacity:         0.15;
+  z-index:         var(--z-zones);
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.zone--craft::-webkit-scrollbar {
+  display: none;
+}
+
+/* Правая зона — Поэзия */
+.zone--poetry {
+  position:        fixed;
+  top:             var(--header-height);
+  right:           0;
+  width:           var(--zone-poetry-width);
+  height:          calc(100vh - var(--header-height) - var(--footer-height));
+  overflow-y:      auto;
+  overflow-x:      hidden;
+  opacity:         0.15;
+  z-index:         var(--z-zones);
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.zone--poetry::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* ─── 3. Центральный блок ─────────────────────────────────────────────────── */
+.site-center {
+  position:        fixed;
+  top:             var(--header-height);
+  width:           100%;
+  height:          calc(100vh - var(--header-height) - var(--footer-height) - var(--projects-height));
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  text-align:      center;
+  opacity:         1;
+  z-index:         1;
+  pointer-events:  none;
+  overflow:        hidden;
+}
+
+.hero-title {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  pointer-events: none;
+}
+
+.hero-signature {
+  width:      auto;
+  max-width:  600px;
+  height:     auto;
+  max-height: 240px;
+  object-fit: contain;
+}
+
+
+/* ─── 4. Заголовок «дизайн» в нижней зоне ───────────────────────────────────── */
+.zone-label--design {
+  display:         flex;
+  justify-content: center;
+  padding:         8px 0 16px 0;
+  margin:          0;
+  font-weight:     400;
+}
+
+.zone-label--design img {
+  display:        block;
+  width:          128px;
+  height:         60px;
+  mix-blend-mode: multiply;
+}
+
+
+/* ─── 5. Шапки мобильных панелей (скрыты на десктопе) ───────────────────────── */
+.panel-header {
+  display: none;
+}
+
+
+/* ─── 6. Карточки — Левая зона (Крафт) ──────────────────────────────────────── */
+.craft-cards-container {
+  display:        flex;
+  flex-direction: column;
+  padding:        4px 0 0;
+}
+
+.card--craft {
+  display:          flex;
+  flex-direction:   row;
+  width:            var(--zone-craft-width);
+  height:           100%;
+  position:         relative;
+  margin-bottom:    4px;
+  gap:              10px;
+  align-items:      stretch;
+}
+
+.card--craft .card__image-wrap {
+  flex:             0 0 50%;
+  width:            50%;
+  height:           100%;
+  background-color: var(--bg-image-cover);
+}
+
+.card--craft .card__image-wrap img {
+  width:           100%;
+  height:          100%;
+  object-fit:      contain;
+  object-position: top center;
+  transition:      transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change:     transform;
+  transform-origin: left center;
+}
+
+/* Состояние зума — поднимаем картинку на верхний слой */
+.card--craft.is-zoomed .card__image-wrap img {
+  z-index: 99;
+  position: relative;
+}
+
+.card-caption-craft {
+  flex:            0 0 50%;
+  width:           50%;
+  height:          100%;
+  display:         grid;
+  grid-template-columns: 1fr 54px;
+  grid-template-rows: auto 1fr;
+  gap:             16px;
+  padding:         0 4px 0 0;
+  opacity:         0;
+  will-change:     opacity;
+  transition:      opacity 0.2s ease;
+}
+
+.card-caption-craft .card__counter {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: start;
+  margin-top: 6px;
+}
+
+.card-caption-craft .card__title {
+  font-family:        var(--font-serif);
+  font-size:          var(--text-title-size);
+  line-height:        var(--text-title-lh);
+  font-weight:        300;
+  color:              var(--text-default);
+  flex:               1;
+  grid-column:        1;
+  grid-row:           1;
+  align-self:         start;
+  overflow:           hidden;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  word-break:         break-word;
+}
+
+.card-caption-craft .card__meta {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  margin-top: 0;
+}
+
+.card--craft:hover .card-caption-craft {
+  opacity: 1;
+}
+
+
+/* ─── 7. Карточки — Правая зона (Поэзия) ────────────────────────────────────── */
+.poetry-cards-container {
+  display:        flex;
+  flex-direction: column;
+  padding:        4px 0 0;
+}
+
+.card--poetry {
+  padding:          8px 20px 16px 40px;
+  position:         relative;
+  display:          grid;
+  grid-template-columns: 45px 1fr;
+  align-items:      start;
+  gap:              12px;
+}
+
+.card__poetry-header {
+  display:          grid;
+  grid-template-columns: 56px 1fr;
+  align-items:      start;
+  grid-column:      1 / span 2;
+  width:            100%;
+}
+
+.card__poetry-header .card__counter {
+  color:            var(--text-default);
+  grid-column:      1;
+  justify-self:     start;
+  margin-bottom:    0;
+  white-space:      nowrap !important;
+}
+
+.card__date {
+  color:            var(--text-default);
+  margin-bottom:    12px;
+  display:          block;
+  grid-column:      2;
+}
+
+.card__poetry-header .card__title {
+  font-family:  var(--font-serif);
+  font-size:    var(--text-title-size);
+  line-height:  var(--text-title-lh);
+  font-weight:  300;
+  color:        var(--text-default);
+  display:      block;
+  grid-column:  2;
+}
+
+.card__poetry-body {
+  display:      block;
+  grid-column:  2;
+}
+
+.card__poetry-text {
+  font-family:         var(--font-serif);
+  font-size:           var(--text-p-size);
+  line-height:         var(--text-p-lh);
+  color:               var(--text-default);
+  display:             -webkit-box;
+  -webkit-line-clamp:  9;
+  line-clamp:  9;
+  -webkit-box-orient:  vertical;
+  overflow:            hidden;
+  max-height:          calc(9 * 1.8em);
+  will-change:         max-height;
+  transition:          max-height 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card--poetry.is-expanded .card__poetry-text {
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  overflow:           hidden;
+}
+
+.poetry-toggle-btn {
+  display:          block;
+  color:            var(--text-default);
+  opacity:          0.65;
+  will-change:      opacity;
+  transition:       opacity 0.2s ease-out;
+  cursor:           pointer;
+  z-index:          2;
+  position:         relative;
+  padding:          12px 20px;
+  margin:           2px -20px 0 -21px;
+}
+
+.poetry-toggle-btn:hover {
+  opacity:          1;
+}
+
+
+/* ─── 8. Карточки — Нижняя зона (Проекты) ───────────────────────────────────── */
+.projects-cards-container {
+  display:          flex;
+  flex-direction:   row;
+  gap:              0;
+  padding:          0;
+  background-color: var(--bg-default);
+  overflow:         visible !important;
+  scroll-behavior:  smooth;
+  height:           100%;
+  align-items:      flex-start;
+  width:            max-content;
+  transition:       var(--transition-transform-smooth-scroll);
+}
+
+.card--project {
+  flex:             0 0 auto;
+  display:          flex;
+  flex-direction:   column;
+  cursor:           pointer;
+  position:         relative;
+  will-change:      transform;
+  transition:       transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-right:     4px;
+  height:           auto;
+}
+
+.card--project:hover {
+  transform:        translateY(-44px);
+}
+
+.card--project:first-child {
+  margin-left: 0;
+}
+
+.card--project:last-child {
+  margin-right: 4px;
+}
+
+.card--project .card__image-wrap {
+  width:            658px;
+  height:           352px;
+  overflow:         hidden;
+  background-color: var(--bg-image-cover);
+}
+
+.card--project .card__image-wrap img {
+  width:           100%;
+  height:          100%;
+  object-fit:      cover;
+  image-rendering: auto;
+  will-change:     transform;
+}
+
+.card__project-info {
+  position:         static;
+  padding:          10px 12px 8px;
+  display:          flex;
+  flex-direction:   column;
+  opacity:          1;
+}
+
+.card__project-info .card__title {
+  font-family:  var(--font-serif);
+  font-size:    var(--text-title-size);
+  line-height:  var(--text-title-lh);
+  font-weight:  300;
+  color:        var(--text-default);
+}
+
+.card__project-info .card__date {
+  color: var(--text-default);
+}
+
+.card__counter {
+  color:        var(--text-default);
+  margin-bottom: 4px;
+}
+
+
+/* ─── CSS-ховеры зон (Desktop) ──────────────────────────────────────────────── */
+body.zone-hovered--craft .zone--craft {
+  opacity:          1 !important;
+  z-index:          var(--z-active);
+  background-image: linear-gradient(to left,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.8) 8%,
+    rgba(255, 255, 255, 1) 28%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+body.zone-hovered--craft .zone--poetry {
+  opacity:        0.15 !important;
+  pointer-events: none;
+}
+body.zone-hovered--craft .zone--projects {
+  opacity:        0.10 !important;
+  pointer-events: none;
+}
+
+body.zone-hovered--poetry .zone--poetry {
+  opacity:          1 !important;
+  z-index:          var(--z-active);
+  background-image: linear-gradient(to right,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.8) 8%,
+    rgba(255, 255, 255, 1) 24%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+body.zone-hovered--poetry .zone--craft {
+  opacity:        0.15 !important;
+  pointer-events: none;
+}
+body.zone-hovered--poetry .zone--projects {
+  opacity:        0.10 !important;
+  pointer-events: none;
+}
+
+body.zone-hovered--projects .zone--projects {
+  opacity:          1 !important;
+}
+body.zone-hovered--projects .zone--craft,
+body.zone-hovered--projects .zone--poetry {
+  opacity:        0.15 !important;
+  pointer-events: none;
+  z-index:        var(--z-zones) !important;
+}
+
+
+/* ─── 9. Hero Entrance — анимация загрузки ─── */
+.zone--craft,
+.zone--poetry,
+.zone--projects {
+  opacity:    0;
+  transform:  translateY(15px);
+}
+
+body.page-loaded .zone--craft {
+  transform:  translateY(0);
+  opacity:    0.15;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1) 0.2s, opacity 0.6s ease-out 0.2s;
+}
+
+body.page-loaded .zone--poetry {
+  transform:  translateY(0);
+  opacity:    0.15;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1) 0.2s, opacity 0.6s ease-out 0.2s;
+}
+
+body.page-loaded .zone--projects {
+  transform:  translateY(0);
+  opacity:    1;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1) 0.2s, opacity 0.4s ease-out 0.4s;
+}
+
+body[class*="zone-hovered--"] .zone,
+body[class*="active-"] .zone {
+  transition: var(--transition-opacity) !important;
+}
+
+
+/* ─── 10. Состояния активных зон (Deep Linking / клик) ───────────────────────── */
+body.active-poetry  .zone--poetry,
+body.active-projects .zone--projects {
+  opacity:          1;
+  z-index:          var(--z-active);
+  transition: opacity 0.2s ease-in-out, transform 0s;
+}
+
+body.active-craft   .zone--poetry,
+body.active-craft   .zone--projects,
+body.active-poetry  .zone--craft,
+body.active-poetry  .zone--projects,
+body.active-projects .zone--craft,
+body.active-projects .zone--poetry {
+  opacity:        0.15;
+  transition:     opacity 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+body:not(.active-craft):not(.active-poetry):not(.active-projects) .zone--craft,
+body:not(.active-craft):not(.active-poetry):not(.active-projects) .zone--poetry {
+  pointer-events: auto;
+}
+
+body.active-craft .card-caption-craft {
+  opacity: 1;
+}
+
+body.active-projects .site-header {
+  background-color: var(--bg-muted);
+}
+body.active-projects .header-zone-btn {
+  background-color: var(--bg-muted);
+}
+body.active-projects .header-logo {
+  background-color: var(--bg-muted);
+}
+
+body.active-craft .zone--craft {
+  background-image: linear-gradient(to left,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.8) 8%,
+    rgba(255, 255, 255, 1) 28%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+
+body.active-poetry .zone--poetry {
+  background-image: linear-gradient(to right,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.8) 8%,
+    rgba(255, 255, 255, 1) 24%,
+    rgba(255, 255, 255, 1) 100%
+  );
+}
+
+
+/* ─── 11. Проектная панель (Sheet) ───────────────────────────────────────────── */
+/* стили уже в global.css */
+
+
+
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   МОБИЛЬНЫЙ АДАПТИВ — единый блок для всех экранов ≤ 1080px
+   ═══════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1080px) {
+
+  /* ── Глобальные переопределения ── */
+  :root {
+    --text-title-size:  1rem;
+    --text-title-lh:    1.5;
+    --text-p-size:      1.1rem;
+    --text-p-lh:        1.8;
+    --text-mono-size:   0.9rem;
+    --text-mono-lh:     1.3;
+    --header-height:    64px;
+    --footer-height:    79px;
+    --projects-height:  264px;
+  }
+
+  img {
+    image-rendering: auto;
+  }
+
+  /* ── Сброс десктопных ховер-классов ── */
+  body.zone-hovered--craft .zone--craft,
+  body.zone-hovered--craft .zone--poetry,
+  body.zone-hovered--craft .zone--projects,
+  body.zone-hovered--poetry .zone--craft,
+  body.zone-hovered--poetry .zone--poetry,
+  body.zone-hovered--poetry .zone--projects,
+  body.zone-hovered--projects .zone--craft,
+  body.zone-hovered--projects .zone--poetry,
+  body.zone-hovered--projects .zone--projects {
+    opacity:        1 !important;
+    pointer-events: auto !important;
+    z-index:        initial !important;
+  }
+
+  body.active-craft   .zone--poetry,
+  body.active-craft   .zone--projects,
+  body.active-poetry  .zone--craft,
+  body.active-poetry  .zone--projects,
+  body.active-projects .zone--craft,
+  body.active-projects .zone--poetry {
+    opacity:        1 !important;
+    pointer-events: auto !important;
+  }
+
+  /* ── Шапка ── */
+  .site-header {
+    width:     100vw;
+    left:      0;
+    transform: none;
+  }
+
+  body.active-projects .site-header,
+  body.active-projects .header-zone-btn,
+  body.active-projects .header-logo {
+    background-color: var(--bg-default) !important;
+  }
+
+  .header-zone-btn {
+    cursor:          pointer;
+    pointer-events:  auto;
+    min-width:       65px;
+    min-height:      48px;
+    padding:         10px 16px 0;
+  }
+
+  .header-zone-btn--craft .header-zone-icon {
+    width:  56px;
+    height: 30px;
+  }
+
+  .header-zone-btn--poetry .header-zone-icon {
+    width:  70px;
+    height: 30px;
+  }
+
+  /* ── Центральный блок ── */
+  .site-center {
+    position: fixed;
+    top: var(--header-height);
+    height: calc(100vh - var(--header-height) - var(--footer-height) - var(--projects-height));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    pointer-events: auto;
+    width:  100%;
+    left: 0;
+    padding: 0 20px;
+  }
+
+  .hero-signature {
+    max-width:  100%;
+    max-height: auto;
+  }
+
+  /* ── Основной layout ── */
+  .site-main {
+    display: block;
+    margin-top: var(--header-height);
+    margin-bottom: var(--footer-height);
+  }
+
+
+  /* ── Зона проектов ── */
+  .zone--projects {
+    position:   fixed;
+    bottom:     var(--footer-height);
+    left:       0;
+    width:      100vw;
+    height:     var(--projects-height);
+    opacity:    1;
+    transform:  none;
+    z-index:    10;
+    overflow:   hidden !important;
+  }
+
+  body.page-loaded .zone--projects {
+    opacity:          1;
+    transform:        none;
+    transition:       none;
+    transition-delay: 0s;
+  }
+
+  .zone-label--design {
+    padding: 4px 0 8px 0;
+  }
+
+  .zone-label--design img {
+    width:  84px;
+    height: 40px;
+  }
+
+  .projects-cards-container {
+    display:          flex;
+    flex-direction:   row;
+    flex-wrap:        nowrap;
+    width:            100%;
+    overflow-x:       auto !important;
+    overflow-y:       visible;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    padding:          0 0 4px;
+    gap:              4px;
+    transform:        none !important;
+    transition:       none !important;
+  }
+
+  .projects-cards-container::-webkit-scrollbar {
+    display: none;
+  }
+  .projects-cards-container {
+    scrollbar-width: none;
+  }
+
+  .card--project {
+    flex:         0 0 auto;
+    width:        auto;
+    margin-right: 0;
+    transform:    none !important;
+    transition:   none !important;
+  }
+
+  .card--project:hover {
+    transform: none !important;
+  }
+
+  .card--project .card__image-wrap {
+    width:  88vw;
+    height: calc(88vw * 0.535);
+  }
+
+  .card--project:first-child {
+    margin-left: 0;
+  }
+
+  .card--project:last-child {
+    margin-right: 0px;
+  }
+
+  .card--project .card__date {
+    display: none;
+  }
+
+  .card__project-info {
+    padding: 10px 16px 8px;
+    width:   88vw;
+  }
+
+  .card__project-info .card__title {
+    font-size:   16px;
+    line-height: 1.3;
+    padding-left: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* ── Офф-канвас панели (Крафт и Поэзия) ── */
+  .zone--craft {
+    position:         fixed;
+    top:              0;
+    left:             0;
+    width:            85vw;
+    height:           100vh;
+    z-index:          var(--z-sheet);
+    background-color: var(--bg-default);
+    opacity:          1;
+    transform:        translateX(-100%);
+    will-change:      transform;
+    transition:       transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow-y:       auto;
+    overflow-x:       hidden;
+    scrollbar-width:  none;
+  }
+
+  .zone--craft.is-open {
+    transform: translateX(0) !important;
+  }
+
+  .zone--craft::-webkit-scrollbar {
+    display: none;
+  }
+
+  .zone--poetry {
+    position:         fixed;
+    top:              0;
+    left:             15vw !important;
+    right:            auto !important;
+    width:            85vw;
+    height:           100vh;
+    z-index:          var(--z-sheet);
+    background-color: var(--bg-default);
+    opacity:          1;
+    transform:        translateX(100%);
+    will-change:      transform;
+    transition:       transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow-y:       auto;
+    overflow-x:       hidden;
+    scrollbar-width:  none;
+  }
+
+  .zone--poetry.is-open {
+    transform: translateX(0) !important;
+  }
+
+  .zone--poetry::-webkit-scrollbar {
+    display: none;
+  }
+
+  body.page-loaded .zone--craft {
+    opacity:          1;
+    transform:        translateX(-100%);
+    transition:       transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition-delay: 0s;
+  }
+
+  body.page-loaded .zone--poetry {
+    opacity:          1;
+    transform:        translateX(100%);
+    transition:       transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    transition-delay: 0s;
+  }
+
+  body.page-loaded .zone--craft.is-open {
+    transform: translateX(0) !important;
+  }
+  body.page-loaded .zone--poetry.is-open {
+    transform: translateX(0) !important;
+  }
+
+  /* ── Шапка мобильных панелей ── */
+  .panel-header {
+    display:          flex;
+    align-items:      center;
+    justify-content:  space-between;
+    padding:          8px 10px;
+    position:         sticky;
+    top:              0;
+    background-color: var(--bg-default);
+    z-index:          1;
+  }
+
+  .panel-title {
+    display:     flex;
+    align-items: center;
+    order:       1;
+    padding: 12px 0 0 8px;
+  }
+
+  .panel-title img {
+    display:        block;
+    mix-blend-mode: multiply;
+  }
+
+  .panel-title img[alt="Арт"] {
+    width:  56px;
+    height: 30px;
+  }
+
+  .panel-title img[alt="Поэзия"] {
+    width:  70px;
+    height: 30px;
+  }
+
+  .panel-close-btn {
+    display:     flex;
+    align-items: center;
+    justify-content: center;
+    padding:     8px;
+    cursor:      pointer;
+    color:       var(--text-default);
+    order:       2;
+    min-width:   44px;
+    min-height:  44px;
+  }
+
+  /* ── Контент внутри панели «Крафт» ── */
+  .craft-cards-container {
+    display:        flex;
+    flex-direction: column;
+    padding:        0;
+    gap:            0;
+  }
+
+  .card--craft {
+    flex-direction:  column;
+    width:           100%;
+    height:          auto;
+    max-height:      none;
+    margin-bottom:   0;
+    gap:             0;
+    border-bottom:   1px solid var(--border-default);
+  }
+
+  .card--craft .card__image-wrap {
+    flex:       none;
+    width:      100%;
+    height:     auto;
+    max-height: none;
+  }
+
+  .card--craft .card__image-wrap img {
+    width:      100%;
+    height:     auto;
+    object-fit: contain;
+  }
+
+  .card-caption-craft {
+    display:         flex;
+    flex-wrap:       wrap;
+    align-items:     baseline;
+    width:           100%;
+    height:          auto;
+    opacity:         1;
+    padding:         8px 12px 12px;
+    gap:             12px;
+  }
+
+  .card-caption-craft .card__counter {
+    display:     inline;
+    grid-column: unset;
+    grid-row:    unset;
+    margin-top:  0;
+  }
+
+  .card-caption-craft .card__counter,
+  .card-caption-craft .card__meta {
+    display: inline;
+    margin-top:  5px;
+  }
+
+  .card-caption-craft .card__title {
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    display:            block;
+    overflow:           visible;
+    width:              100%;
+  }
+
+  .card-caption-craft .card__meta {
+    display:     block;
+    grid-column: unset;
+    grid-row:    unset;
+    align-self:  unset;
+  }
+
+  /* ── Контент внутри панели «Поэзия» ── */
+  .poetry-cards-container {
+    display:        flex;
+    flex-direction: column;
+    padding:        0;
+    gap:            0;
+  }
+
+  .card--poetry {
+    display:     block;
+    padding:     16px 20px 8px;
+    grid-template-columns: unset;
+    gap:         0;
+  }
+
+  .card__poetry-header {
+    display:     flex;
+    flex-wrap:   wrap;
+    align-items: baseline;
+    gap:         12px;
+    grid-column: unset;
+    width:       100%;
+    margin-bottom: 8px;
+  }
+
+  .card__poetry-header .card__counter {
+    grid-column: unset;
+    white-space: nowrap;
+  }
+
+  .card__date {
+    grid-column: unset;
+    display:     inline;
+    margin-bottom: 0;
+  }
+
+  .card__poetry-header .card__title {
+    display:   block;
+    width:     100%;
+    grid-column: unset;
+    margin-top: 4px;
+  }
+
+  .card__poetry-body {
+    grid-column: unset;
+    margin-top:  4px;
+  }
+
+  .card__poetry-text {
+    -webkit-line-clamp: 9;
+    line-clamp: 9;
+    max-height: calc(9 * var(--text-p-lh) * 1em);
+  }
+
+  .card--poetry.is-expanded .card__poetry-text {
+    -webkit-line-clamp: unset;
+    line-clamp:         unset;
+    overflow:           hidden;
+  }
+
+  .poetry-toggle-btn {
+    padding:      14px 20px;
+    margin:       0 -20px;
+    min-height:   44px;
+    display:      flex;
+    align-items:  center;
+  }
+
+  /* ── BottomSheet (панель проекта) ── */
+  .project-sheet {
+    left:   0;
+    width:  100vw;
+    height: 90vh;
+  }
+
+  .project-sheet__bar {
+    height:          52px;
+    border-bottom:   1px solid var(--border-default);
+    justify-content: center;
+  }
+
+  .project-sheet__close {
+    padding: 16px 32px;
+  }
+
+  .project-sheet__content {
+    padding: 24px 20px 40px;
+  }
+
+  /* ── Overlay ── */
+  .site-overlay.is-visible {
+    opacity:        1;
+    pointer-events: auto;
+  }
+
+  /* ── Футер ── */
+  .footer-inner {
+    display:        grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows:    auto auto;
+    align-items:    center;
+    gap:            4px 0;
+    padding:        10px 20px;
+    height:         auto;
+    min-height:     var(--footer-height);
+  }
+
+  .footer-timer {
+    grid-column: 1;
+    grid-row:    1;
+    font-size:   12px;
+  }
+
+  .footer-player {
+    grid-column: 2;
+    grid-row:    1;
+    text-align:  right;
+    font-size:   12px;
+  }
+
+  .footer-contacts {
+    grid-column: 1 / span 2;
+    grid-row:    2;
+    justify-content: space-between;
+    gap:         0;
+  }
+
+  .footer-link {
+    font-size: 12px;
+  }
+
+} /* конец медиа-запроса */

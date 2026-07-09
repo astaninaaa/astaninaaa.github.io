@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ясна Астанина — продуктовый UX/UI дизайнер с 6-летним опытом в b2b/b2c продуктах для аудитории 50+ млн пользователей." />
+  <title>Ясна Астанина — UX/UI дизайнер</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet" /> -->
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,300;7..72,400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/main-page.css" />
+</head>
+
+<body>
+
+  <!-- ===================== ШАПКА ===================== -->
+  <header class="site-header" role="banner">
+    <nav class="header-nav" aria-label="Разделы сайта">
+      <button class="header-zone-btn header-zone-btn--craft" aria-controls="zone-craft" aria-expanded="false" aria-label="Открыть раздел Крафт">
+        <img
+          class="header-zone-icon"
+          src="images/astaninaaa-art-h2.webp"
+          alt="Арт"
+          width="70" height="42"
+          loading="eager" fetchpriority="high"
+        />
+      </button>
+      <a class="header-logo" href="/" aria-label="На главную страницу">
+        <!-- ЗДЕСЬ ВСТАВИТЬ SVG-ЛОГОТИП (инлайн или через img) -->
+        <img src="images/astaninaaa-logo.svg" alt="Ясна Астанина" width="56" height="56" loading="eager" fetchpriority="high" />
+        <!-- <svg>...</svg> -->
+      </a>
+      <button class="header-zone-btn header-zone-btn--poetry" aria-controls="zone-poetry" aria-expanded="false" aria-label="Открыть раздел Поэзия">
+        <img
+          class="header-zone-icon"
+          src="images/astaninaaa-poetry-h2.webp"
+          alt="Поэзия"
+          width="100" height="42"
+          loading="eager" fetchpriority="high"
+        />
+      </button>
+    </nav>
+  </header>
+
+
+  <!-- ===================== ОСНОВНОЙ КОНТЕНТ ===================== -->
+  <main class="site-main">
+
+    <!-- ═══════════ ЛЕВАЯ ЗОНА — КРАФТ ═══════════ -->
+    <aside id="zone-craft" class="zone zone--craft" aria-label="Крафт: рисунки и ручная работа">
+      <h2 class="zone__title visually-hidden">Арт</h2>
+
+      <div class="panel-header" aria-hidden="true">
+        <button class="panel-close-btn" aria-label="Закрыть панель Крафт" data-panel="craft">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="20" y1="4" x2="4" y2="20" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button>
+        <span class="panel-title">
+          <img
+            src="images/astaninaaa-art-h2.webp"
+            alt="Арт"
+            width="70" height="42"
+            loading="eager"
+          />
+        </span>
+      </div>
+
+      <div class="craft-cards-container" id="craft-cards-container"></div>
+    </aside>
+
+
+    <!-- ═══════════ ЦЕНТРАЛЬНЫЙ БЛОК ═══════════ -->
+    <div class="site-center" aria-label="Центральный блок">
+      <h1 class="hero-title">
+        <img
+          class="hero-signature"
+          src="images/astaninaaa-designer-sighnature.webp"
+          alt="Ясна Астанина"
+          width="560" height="200"
+          loading="eager" fetchpriority="high"
+        />
+      </h1>
+    </div>
+
+
+    <!-- ═══════════ ПРАВАЯ ЗОНА — ПОЭЗИЯ ═══════════ -->
+    <aside id="zone-poetry" class="zone zone--poetry" aria-label="Поэзия">
+      <h2 class="zone__title visually-hidden">Поэзия</h2>
+
+      <div class="panel-header" aria-hidden="true">
+        <button class="panel-close-btn" aria-label="Закрыть панель Поэзия" data-panel="poetry">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <line x1="4" y1="4" x2="20" y2="20" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="20" y1="4" x2="4" y2="20" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </button>
+        <span class="panel-title">
+          <img
+            src="images/astaninaaa-poetry-h2.webp"
+            alt="Поэзия"
+            width="100" height="42"
+            loading="eager"
+          />
+        </span>
+      </div>
+
+      <div class="poetry-cards-container" id="poetry-cards-container"></div>
+    </aside>
+
+  </main>
+
+
+  <!-- ═══════════ НИЖНЯЯ ЗОНА — ПРОЕКТЫ ═══════════ -->
+  <section id="zone-projects" class="zone zone--projects" aria-label="Проекты">
+    <h2 class="zone-label--design">
+      <img
+        src="images/astaninaaa-design-h2.webp"
+        alt="Дизайн"
+        width="120" height="56"
+        loading="eager" fetchpriority="high"
+      />
+    </h2>
+
+    <!-- Контейнер заполняется JS из projects.json -->
+    <div class="projects-cards-container" id="projects-cards-container"></div>
+  </section>
+
+
+  <!-- ═══════════ ПАНЕЛЬ ПРОЕКТА ═══════════ -->
+  <div id="project-sheet" class="project-sheet" role="dialog" aria-modal="true" aria-label="Страница проекта" hidden>
+    <div class="project-sheet__bar">
+      <button class="project-sheet__close" aria-label="Закрыть страницу проекта">
+        <svg width="32" height="20" viewBox="0 0 32 20" fill="none" aria-hidden="true">
+          <path d="M2 2L16 18L30 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="project-sheet__content" id="project-sheet-content"></div>
+  </div>
+
+  <div class="site-overlay" id="site-overlay" aria-hidden="true"></div>
+
+
+  <!-- ===================== ФУТЕР ===================== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <time class="footer-timer mono" id="footer-timer" aria-live="polite">--:-- +7 GMT</time>
+      <span class="footer-player mono" aria-label="Звук включен"></span>
+      <nav class="footer-contacts" aria-label="Контакты">
+        <a class="footer-link" href="mailto:astanina.aa@yandex.ru" aria-label="Написать на email">email</a>
+        <a class="footer-link" href="https://t.me/astaninaaa" target="_blank" rel="noopener noreferrer" aria-label="Написать в Telegram">telegram</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="js/global.js"></script>
+  <script src="js/main-page.js"></script>
+</body>
+</html>

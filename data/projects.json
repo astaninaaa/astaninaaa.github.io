@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "src": "images/projects/astaninaaa-lantan-project.webp",
+    "alt": "Редизайн сайта ИТ-компании Лантан в 2 темах на любой адаптив",
+    "title": "Редизайн сайта ИТ-компании Лантан в 2 темах на любой адаптив",
+    "date": "",
+    "link": "projects/lantan.html",
+    "related_content": { "type": "poetry", "id": 3 }
+  },
+  {
+    "id": 2,
+    "src": "images/projects/astaninaaa-hr-system-project.webp",
+    "alt": "Система для ускорения и автоматизации рекрутинга, SaaS",
+    "title": "Система для ускорения и автоматизации рекрутинга, SaaS",
+    "date": "",
+    "link": "projects/hr-system.html",
+    "related_content": null
+  },
+  {
+    "id": 3,
+    "src": "images/projects/astaninaaa-tickets-system-project.webp",
+    "alt": "Билетная система ТОП-1 в Казахстане, 5M+ MAU",
+    "title": "Билетная система ТОП-1 в Казахстане, 5M+ MAU",
+    "date": "",
+    "link": "projects/ticket.html",
+    "related_content": null
+  },
+  {
+    "id": 4,
+    "src": "images/projects/astaninaaa-spren-project.webp",
+    "alt": "Spren — биомаркеры для фитнес приложений в Европе и США",
+    "title": "Spren — биомаркеры для фитнес приложений в Европе и США",
+    "date": "",
+    "link": "projects/spren.html",
+    "related_content": null
+  },
+  {
+    "id": 5,
+    "src": "images/projects/astaninaaa-pinata-project.webp",
+    "alt": "Pinata — первая в мире бонусная система для арендаторов в США",
+    "title": "Pinata — первая в мире бонусная система для арендаторов в США",
+    "date": "",
+    "link": "projects/pinata.html",
+    "related_content": null
+  }
+]
