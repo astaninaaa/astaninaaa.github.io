@@ -32,7 +32,7 @@
   /* Размеры статичных якорей */
   --header-height:     64px;
   --footer-height:     44px;
-  --projects-height:   440px;
+  --projects-height:   47vh;
 
   /* Ширины зон */
   --zone-craft-width:  30vw;
@@ -176,8 +176,8 @@ button {
   display:         flex;
   align-items:     center;
   justify-content: center;
-  cursor:          default;
-  pointer-events:  none;
+  cursor:          pointer;
+  pointer-events:  auto;
   background:      var(--bg-default);
   border:          none;
   padding:         16px 16px 2px;
@@ -226,6 +226,11 @@ button {
   width:      56px;
   height:     56px;
   object-fit: contain;
+}
+
+.header-zone-btn:hover .header-zone-icon {
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
 }
 
 

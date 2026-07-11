@@ -48,271 +48,6 @@ function renderPlaceholder(container) {
 }
 
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   6. РЕНДЕР КАРТОЧЕК ИЗ JSON
-   Все три функции вызываются асинхронно — независимо друг от друга.
-   Ошибка в одном JSON не блокирует рендер остальных зон.
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-/* ─── 6a. Крафт ──────────────────────────────────────────────────────────────── */
-async function renderCraft() {
-  const container = document.getElementById('craft-cards-container');
-  if (!container) return;
-
-  let items;
-  try {
-    const response = await fetch('data/craft.json');
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    items = await response.json();
-  } catch (err) {
-    console.warn('[main-page.js] Ошибка загрузки craft.json:', err);
-    renderPlaceholder(container);
-    return;
-  }
-
-  if (!Array.isArray(items) || items.length === 0) {
-    renderPlaceholder(container);
-    return;
-  }
-
-  container.textContent = '';
-  const total = items.length;
-
-  items.forEach((item, index) => {
-    // Первые 3 карточки — eager (видны при загрузке), остальные — lazy
-    const isEager = index < 3;
-
-    // <article class="card card--craft">
-    const article = document.createElement('article');
-    article.className = 'card card--craft';
-
-    // Обёртка картинки
-    const imageWrap = document.createElement('div');
-    imageWrap.className = 'card__image-wrap';
-
-    const img = document.createElement('img');
-    if (hasValue(item.src))  img.src    = item.src;
-    if (hasValue(item.alt))  img.alt    = item.alt;
-    else                     img.alt    = '';
-    img.width   = item.width  || 280;
-    img.height  = item.height || 210;
-    img.loading = isEager ? 'eager' : 'lazy';
-
-    imageWrap.appendChild(img);
-    article.appendChild(imageWrap);
-
-    // Подпись
-    const caption = document.createElement('div');
-    caption.className = 'card-caption-craft';
-
-    // Счётчик
-    const counter = document.createElement('p');
-    counter.className = 'card__counter mono';
-    counter.textContent = `${index + 1}/${total}`;
-    caption.appendChild(counter);
-
-    // Заголовок
-    if (hasValue(item.title)) {
-      const title = document.createElement('h3');
-      title.className = 'card__title';
-      title.textContent = item.title;
-      caption.appendChild(title);
-    }
-
-    // Дата
-    if (hasValue(item.date)) {
-      const meta = document.createElement('p');
-      meta.className = 'card__meta mono';
-      meta.textContent = item.date;
-      caption.appendChild(meta);
-    }
-
-    article.appendChild(caption);
-    container.appendChild(article);
-  });
-
-  initArtZoom();
-
-}
-
-
-/* ─── 6b. Поэзия ─────────────────────────────────────────────────────────────── */
-async function renderPoetry() {
-  const container = document.getElementById('poetry-cards-container');
-  if (!container) return;
-
-  let items;
-  try {
-    const response = await fetch('data/poetry.json');
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    items = await response.json();
-  } catch (err) {
-    console.warn('[main-page.js] Ошибка загрузки poetry.json:', err);
-    renderPlaceholder(container);
-    return;
-  }
-
-  if (!Array.isArray(items) || items.length === 0) {
-    renderPlaceholder(container);
-    return;
-  }
-
-  container.textContent = '';
-  const total = items.length;
-
-  items.forEach((item, index) => {
-    const article = document.createElement('article');
-    article.className = 'card card--poetry';
-
-    // Шапка карточки
-    const header = document.createElement('header');
-    header.className = 'card__poetry-header';
-
-    const counter = document.createElement('p');
-    counter.className = 'card__counter mono';
-    counter.textContent = `${index + 1}/${total}`;
-    header.appendChild(counter);
-
-    if (hasValue(item.date)) {
-      const time = document.createElement('time');
-      time.className = 'card__date mono';
-      if (hasValue(item.datetime)) time.setAttribute('datetime', item.datetime);
-      time.textContent = item.date;
-      header.appendChild(time);
-    }
-
-    if (hasValue(item.title)) {
-      const h3 = document.createElement('h3');
-      h3.className = 'card__title';
-      h3.textContent = item.title;
-      header.appendChild(h3);
-    }
-
-    article.appendChild(header);
-
-    // Тело карточки
-    const body = document.createElement('div');
-    body.className = 'card__poetry-body';
-
-    // Текст стиха
-    let textEl = document.createElement('p');
-    textEl.className = 'card__poetry-text';
-
-    const lines = item.text.split('\n');
-    lines.forEach((line, i) => {
-      textEl.appendChild(document.createTextNode(line));
-      if (i < lines.length - 1) {
-        textEl.appendChild(document.createElement('br'));
-      }
-    });
-
-    body.appendChild(textEl);
-    article.appendChild(body);
-
-    // --- АВТОМАТИЧЕСКОЕ ОПРЕДЕЛЕНИЕ НУЖНОСТИ КНОПКИ ---
-    // Временно добавляем карточку в DOM, чтобы измерить высоту
-    container.appendChild(article);
-
-    // Получаем ограничение max-height из CSS (13.5em)
-    const maxHeight = parseFloat(getComputedStyle(textEl).maxHeight) || 0;
-    const scrollHeight = textEl.scrollHeight;
-
-    // Если текст превышает maxHeight, добавляем кнопку
-    if (scrollHeight > maxHeight + 2) { // +2 для погрешности
-      const btn = document.createElement('button');
-      btn.className = 'poetry-toggle-btn mono';
-      btn.setAttribute('aria-expanded', 'false');
-      btn.textContent = '[...]';
-      body.appendChild(btn);
-    } else {
-      // Если текста мало, сразу раскрываем и не добавляем кнопку
-      article.classList.add('is-expanded');
-    }
-
-    // После измерения и добавления кнопки, оставляем карточку в DOM
-    // (она уже добавлена через container.appendChild)
-  });
-
-  // Инициализируем интерактив (ховеры, клики) — для всех карточек,
-  // даже у которых нет кнопки, обработчики будут навешаны, но не сработают
-  initPoetryExpand();
-}
-
-
-
-
-
-/* ─── 6c. Проекты ────────────────────────────────────────────────────────────── */
-async function renderProjects() {
-  const container = document.getElementById('projects-cards-container');
-  if (!container) return;
-
-  let items;
-  try {
-    const response = await fetch('data/projects.json');
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    items = await response.json();
-  } catch (err) {
-    console.warn('[main-page.js] Ошибка загрузки projects.json:', err);
-    renderPlaceholder(container);
-    return;
-  }
-
-  if (!Array.isArray(items) || items.length === 0) {
-    renderPlaceholder(container);
-    return;
-  }
-
-  container.textContent = '';
-
-  items.forEach((item, index) => {
-    // Первые 3 карточки — eager, остальные — lazy
-    const isEager = index < 3;
-
-    // Валидация ссылки: если пустая или '#' — рендерим <div>, иначе <a>
-    const hasLink = isValidLink(item.link);
-    const card = document.createElement(hasLink ? 'a' : 'div');
-    card.className = 'card card--project';
-
-    if (hasLink) {
-      card.href = item.link;
-      if (hasValue(item.title)) {
-        card.setAttribute('aria-label', `Открыть кейс: ${item.title}`);
-      }
-    }
-
-    // Обёртка картинки
-    const imageWrap = document.createElement('div');
-    imageWrap.className = 'card__image-wrap';
-
-    const img = document.createElement('img');
-    if (hasValue(item.src)) img.src   = item.src;
-    if (hasValue(item.alt)) img.alt   = item.alt;
-    else                    img.alt   = '';
-    img.width   = 658;
-    img.height  = 352;
-    img.loading = isEager ? 'eager' : 'lazy';
-
-    imageWrap.appendChild(img);
-    card.appendChild(imageWrap);
-
-    // Подпись проекта
-    const info = document.createElement('div');
-    info.className = 'card__project-info';
-
-    if (hasValue(item.title)) {
-      const h3 = document.createElement('h3');
-      h3.className = 'card__title';
-      h3.textContent = item.title;
-      info.appendChild(h3);
-    }
-
-    card.appendChild(info);
-    container.appendChild(card);
-  });
-}
-
-
 /* ─── Запуск рендера — все три зоны параллельно ──────────────────────────────── */
 // Promise.allSettled гарантирует: даже если один fetch упадёт,
 // два других продолжат рендер независимо.
@@ -365,6 +100,10 @@ Promise.allSettled([
   const siteHeader   = document.querySelector('.site-header');
   const siteCenter   = document.querySelector('.site-center');
 
+  // --- НОВОЕ: кнопки шапки ---
+  const btnCraft   = document.querySelector('.header-zone-btn--craft');
+  const btnPoetry  = document.querySelector('.header-zone-btn--poetry');
+
   if (!zoneCraft || !zonePoetry || !zoneProjects) return;
 
   const HOVER_CLASSES = [
@@ -401,6 +140,25 @@ Promise.allSettled([
   zoneCraft.addEventListener('mouseleave', () => setHoverClass('zone-hovered--projects'));
   zonePoetry.addEventListener('mouseleave', () => setHoverClass('zone-hovered--projects'));
 
+  // --- НОВОЕ: ховеры на кнопки шапки ---
+  if (btnCraft) {
+    btnCraft.addEventListener('mouseenter', () => setHoverClass('zone-hovered--craft'));
+    btnCraft.addEventListener('mouseleave', () => {
+      // Не сбрасываем на проекты, если активна craft-зона
+      if (!document.body.classList.contains('active-craft')) {
+        setHoverClass('zone-hovered--projects');
+      }
+    });
+  }
+
+  if (btnPoetry) {
+    btnPoetry.addEventListener('mouseenter', () => setHoverClass('zone-hovered--poetry'));
+    btnPoetry.addEventListener('mouseleave', () => {
+      if (!document.body.classList.contains('active-poetry')) {
+        setHoverClass('zone-hovered--projects');
+      }
+    });
+  }
 
   // Шапка и центральный бренд-блок по ТЗ отдают приоритет 100% видимости проектам
   if (siteHeader) {
@@ -421,51 +179,69 @@ Promise.allSettled([
 })();
 
 
-/* ═══════════════════════════════════════════════════════════════════════════════
-   2б. WHEEL-СКРОЛЛ В ЗОНЕ ПРОЕКТОВ
-   Вертикальный wheel перенаправляется в горизонтальный скролл ленты проектов
-   только тогда, когда мышь физически находится над контейнером проектов.
-   ═══════════════════════════════════════════════════════════════════════════════ */
+
+
+/* ─── 2б. WHEEL-СКРОЛЛ В ЗОНЕ ПРОЕКТОВ ─── */
 (function initPremiumSlider() {
-  // На мобайле этот блок полностью спит и не блокирует нативный тач-скролл пальцем.
   if (!window.matchMedia('(min-width: 1081px)').matches) return;
 
   const zoneProjects = document.getElementById('zone-projects');
   const container = document.getElementById('projects-cards-container');
   if (!zoneProjects || !container) return;
 
-  let isMouseOver = false;
-  let currentTranslateX = 0; // Текущее положение ленты в пикселях
-
-  zoneProjects.addEventListener('mouseenter', () => { isMouseOver = true; });
-  zoneProjects.addEventListener('mouseleave', () => { isMouseOver = false; });
+  let currentTranslateX = 0;
 
   document.addEventListener('wheel', (e) => {
-    if (!isMouseOver) return;
+    // 1. Если активна боковая зона — проекты не скроллятся
+    const isActiveZone = document.body.classList.contains('active-craft') ||
+                         document.body.classList.contains('active-poetry');
+    if (isActiveZone) return;
 
+    // 2. Если курсор над кнопкой шапки — скроллим соответствующую зону
+    const btnCraft = e.target.closest('.header-zone-btn--craft');
+    const btnPoetry = e.target.closest('.header-zone-btn--poetry');
+
+    if (btnCraft) {
+      const zone = document.getElementById('zone-craft');
+      if (zone) {
+        zone.scrollTop += e.deltaY;
+        e.preventDefault();
+      }
+      return;
+    }
+
+    if (btnPoetry) {
+      const zone = document.getElementById('zone-poetry');
+      if (zone) {
+        zone.scrollTop += e.deltaY;
+        e.preventDefault();
+      }
+      return;
+    }
+
+    // 3. Если событие пришло из боковой зоны (или её потомков) — игнорируем
+    const target = e.target.closest('.zone--craft, .zone--poetry');
+    if (target) return;
+
+    // 4. В остальных случаях — скроллим проекты
     if (e.deltaY !== 0) {
       e.preventDefault();
 
-      // Рассчитываем максимальную длину прокрутки ленты
       const zoneWidth = zoneProjects.offsetWidth;
       const containerWidth = container.scrollWidth;
       const maxScroll = containerWidth - zoneWidth;
-
-      // Если контент помещается на экране — скролл не нужен
       if (maxScroll <= 0) return;
 
-      // Изменяем координату сдвига (deltaY крутит ленту влево/вправо)
       currentTranslateX -= e.deltaY;
-
-      // Жесткие рамки, чтобы лента не улетала в пустоту за края экрана
       if (currentTranslateX > 0) currentTranslateX = 0;
       if (currentTranslateX < -maxScroll) currentTranslateX = -maxScroll;
 
-      // Двигаем саму ленту физически по оси X на чистом GPU без включения overflow!
       container.style.transform = `translateX(${currentTranslateX}px)`;
     }
   }, { passive: false });
 })();
+
+
 
 
 /* ═══════════════════════════════════════════════════════════════════════════════
@@ -506,6 +282,10 @@ function deactivateAllZones() {
   const zoneCraft  = document.getElementById('zone-craft');
   const zonePoetry = document.getElementById('zone-poetry');
 
+  // --- НОВОЕ: кнопки шапки ---
+  const btnCraft   = document.querySelector('.header-zone-btn--craft');
+  const btnPoetry  = document.querySelector('.header-zone-btn--poetry');
+
   if (!zoneCraft || !zonePoetry) return;
 
   function bindZoneClick(zoneEl, zoneName) {
@@ -528,6 +308,33 @@ function deactivateAllZones() {
 
   bindZoneClick(zoneCraft,    'craft');
   bindZoneClick(zonePoetry,   'poetry');
+
+  // --- НОВОЕ: клики по кнопкам шапки (только на десктопе) ---
+  if (window.matchMedia('(min-width: 1081px)').matches) {
+    if (btnCraft) {
+      btnCraft.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = document.body.classList.contains('active-craft');
+        if (isActive) {
+          deactivateAllZones();
+        } else {
+          activateZone('craft');
+        }
+      });
+    }
+
+    if (btnPoetry) {
+      btnPoetry.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isActive = document.body.classList.contains('active-poetry');
+        if (isActive) {
+          deactivateAllZones();
+        } else {
+          activateZone('poetry');
+        }
+      });
+    }
+  }
 
   // Клик за пределами активной боковой зоны снимает фиксацию
   document.addEventListener('click', (e) => {
@@ -812,7 +619,435 @@ function initPoetryExpand() {
     }
   });
 
+  /* МОБИЛЬНЫЙ СВАЙП ДЛЯ ЗАКРЫТИЯ BOTTOMSHEET (только ≤ 1080px) */
+  if (window.matchMedia('(max-width: 1080px)').matches) {
+    let touchStartY = 0;
+
+    sheet.addEventListener('touchstart', (e) => {
+      // Игнорируем, если панель закрыта
+      if (!sheet.classList.contains('is-open')) return;
+      // Игнорируем тачи по кнопкам/ссылкам, чтобы не мешать их нажатию
+      if (e.target.closest('button') || e.target.closest('a')) return;
+      touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    sheet.addEventListener('touchend', (e) => {
+      if (!sheet.classList.contains('is-open')) return;
+      if (e.target.closest('button') || e.target.closest('a')) return;
+
+      const touchEndY = e.changedTouches[0].clientY;
+      const deltaY = touchEndY - touchStartY;
+
+      // Закрываем только при свайпе вниз (deltaY > 0) на расстояние > 50px
+      // и только если контент прокручен до самого верха (защита от случайного закрытия)
+      if (deltaY > 50 && sheet.scrollTop === 0) {
+        closeSheet();
+      }
+    }, { passive: true });
+  }
+
 })();
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   ДЕСКТОПНЫЙ ZOOM ДЛЯ КАРТОЧЕК КРАФТА (только экраны ≥ 1081px)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+function initArtZoom() {
+  // Только десктоп
+  if (!window.matchMedia('(min-width: 1081px)').matches) return;
+
+  const craftContainer = document.getElementById('craft-cards-container');
+  if (!craftContainer) return;
+
+  const cards = craftContainer.querySelectorAll('.card--craft');
+  if (cards.length === 0) return;
+
+  cards.forEach((card) => {
+    const img = card.querySelector('.card__image-wrap img');
+    if (!img) return;
+
+    // Удаляем старые обработчики, если они были (защита от дублирования)
+    card.removeEventListener('mouseenter', card._zoomEnter);
+    card.removeEventListener('mousemove', card._zoomMove);
+    card.removeEventListener('mouseleave', card._zoomLeave);
+
+    // Функция-обработчик входа мыши
+    const onEnter = () => {
+      card.classList.add('is-zoomed');
+    };
+
+    // Функция-обработчик движения мыши
+    const onMove = (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left; // позиция мыши относительно левого края карточки
+      const width = rect.width;
+      const ratio = Math.min(Math.max(x / width, 0), 1); // 0..1
+
+      // Слепая зона: первые 15% слева — без зума
+      let scale = 1;
+      if (ratio < 0.4) {
+        // От 0.15 до 1.0 масштаб линейно растёт от 1.0 до 1.6
+        const t = (ratio) / 0.4; // 0..1
+        scale = 1 + (1 - t) * 1; // 1.0 .. 1.8
+      }
+
+      img.style.transform = `scale(${scale})`;
+    };
+
+    // Функция-обработчик ухода мыши
+    const onLeave = () => {
+      card.classList.remove('is-zoomed');
+      img.style.transform = ''; // сброс к базовому
+    };
+
+    // Сохраняем ссылки на функции, чтобы потом удалить
+    card._zoomEnter = onEnter;
+    card._zoomMove = onMove;
+    card._zoomLeave = onLeave;
+
+    // Навешиваем события
+    card.addEventListener('mouseenter', onEnter);
+    card.addEventListener('mousemove', onMove);
+    card.addEventListener('mouseleave', onLeave);
+  });
+}
+
+
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   6. РЕНДЕР КАРТОЧЕК ИЗ JSON
+   Все три функции вызываются асинхронно — независимо друг от друга.
+   Ошибка в одном JSON не блокирует рендер остальных зон.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 6a. Крафт ──────────────────────────────────────────────────────────────── */
+async function renderCraft() {
+  const container = document.getElementById('craft-cards-container');
+  if (!container) return;
+
+  let items;
+  try {
+    const response = await fetch('data/craft.json');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    items = await response.json();
+  } catch (err) {
+    console.warn('[main-page.js] Ошибка загрузки craft.json:', err);
+    renderPlaceholder(container);
+    return;
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    renderPlaceholder(container);
+    return;
+  }
+
+  container.textContent = '';
+  const total = items.length;
+
+  items.forEach((item, index) => {
+    // Первые 3 карточки — eager (видны при загрузке), остальные — lazy
+    const isEager = index < 3;
+
+    // <article class="card card--craft">
+    const article = document.createElement('article');
+    article.className = 'card card--craft';
+
+    // Обёртка картинки
+    const imageWrap = document.createElement('div');
+    imageWrap.className = 'card__image-wrap';
+
+    const img = document.createElement('img');
+    if (hasValue(item.src))  img.src    = item.src;
+    if (hasValue(item.alt))  img.alt    = item.alt;
+    else                     img.alt    = '';
+    img.width   = item.width  || 280;
+    img.height  = item.height || 210;
+    img.loading = isEager ? 'eager' : 'lazy';
+
+    imageWrap.appendChild(img);
+    article.appendChild(imageWrap);
+
+    // Подпись
+    const caption = document.createElement('div');
+    caption.className = 'card-caption-craft';
+
+    // Счётчик
+    const counter = document.createElement('p');
+    counter.className = 'card__counter mono';
+    counter.textContent = `${index + 1}/${total}`;
+    caption.appendChild(counter);
+
+    // Заголовок
+    if (hasValue(item.title)) {
+      const title = document.createElement('h3');
+      title.className = 'card__title';
+      title.textContent = item.title;
+      caption.appendChild(title);
+    }
+
+    // Дата
+    if (hasValue(item.date)) {
+      const meta = document.createElement('p');
+      meta.className = 'card__meta mono';
+      meta.textContent = item.date;
+      caption.appendChild(meta);
+    }
+
+    article.appendChild(caption);
+    container.appendChild(article);
+  });
+
+  initArtZoom();
+
+}
+
+
+/* ─── 6b. Поэзия ─────────────────────────────────────────────────────────────── */
+async function renderPoetry() {
+  const container = document.getElementById('poetry-cards-container');
+  if (!container) return;
+
+  let items;
+  try {
+    const response = await fetch('data/poetry.json');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    items = await response.json();
+  } catch (err) {
+    console.warn('[main-page.js] Ошибка загрузки poetry.json:', err);
+    renderPlaceholder(container);
+    return;
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    renderPlaceholder(container);
+    return;
+  }
+
+  container.textContent = '';
+  const total = items.length;
+
+  items.forEach((item, index) => {
+    const article = document.createElement('article');
+    article.className = 'card card--poetry';
+
+    // Шапка карточки
+    const header = document.createElement('header');
+    header.className = 'card__poetry-header';
+
+    const counter = document.createElement('p');
+    counter.className = 'card__counter mono';
+    counter.textContent = `${index + 1}/${total}`;
+    header.appendChild(counter);
+
+    if (hasValue(item.date)) {
+      const time = document.createElement('time');
+      time.className = 'card__date mono';
+      if (hasValue(item.datetime)) time.setAttribute('datetime', item.datetime);
+      time.textContent = item.date;
+      header.appendChild(time);
+    }
+
+    if (hasValue(item.title)) {
+      const h3 = document.createElement('h3');
+      h3.className = 'card__title';
+      h3.textContent = item.title;
+      header.appendChild(h3);
+    }
+
+    article.appendChild(header);
+
+    // Тело карточки
+    const body = document.createElement('div');
+    body.className = 'card__poetry-body';
+
+    // Текст стиха
+    let textEl = document.createElement('p');
+    textEl.className = 'card__poetry-text';
+
+    const lines = item.text.split('\n');
+    lines.forEach((line, i) => {
+      textEl.appendChild(document.createTextNode(line));
+      if (i < lines.length - 1) {
+        textEl.appendChild(document.createElement('br'));
+      }
+    });
+
+    body.appendChild(textEl);
+    article.appendChild(body);
+
+    // --- АВТОМАТИЧЕСКОЕ ОПРЕДЕЛЕНИЕ НУЖНОСТИ КНОПКИ ---
+    // Временно добавляем карточку в DOM, чтобы измерить высоту
+    container.appendChild(article);
+
+    // Получаем ограничение max-height из CSS (13.5em)
+    const maxHeight = parseFloat(getComputedStyle(textEl).maxHeight) || 0;
+    const scrollHeight = textEl.scrollHeight;
+
+    // Если текст превышает maxHeight, добавляем кнопку
+    if (scrollHeight > maxHeight + 2) { // +2 для погрешности
+      const btn = document.createElement('button');
+      btn.className = 'poetry-toggle-btn mono';
+      btn.setAttribute('aria-expanded', 'false');
+      btn.textContent = '[...]';
+      body.appendChild(btn);
+    } else {
+      // Если текста мало, сразу раскрываем и не добавляем кнопку
+      article.classList.add('is-expanded');
+    }
+
+    // После измерения и добавления кнопки, оставляем карточку в DOM
+    // (она уже добавлена через container.appendChild)
+  });
+
+  // Инициализируем интерактив (ховеры, клики) — для всех карточек,
+  // даже у которых нет кнопки, обработчики будут навешаны, но не сработают
+  initPoetryExpand();
+}
+
+
+
+
+
+/* ─── 6c. Проекты ────────────────────────────────────────────────────────────── */
+async function renderProjects() {
+  const container = document.getElementById('projects-cards-container');
+  if (!container) return;
+
+  let items;
+  try {
+    const response = await fetch('data/projects.json');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    items = await response.json();
+  } catch (err) {
+    console.warn('[main-page.js] Ошибка загрузки projects.json:', err);
+    renderPlaceholder(container);
+    return;
+  }
+
+  if (!Array.isArray(items) || items.length === 0) {
+    renderPlaceholder(container);
+    return;
+  }
+
+  container.textContent = '';
+
+  items.forEach((item, index) => {
+    // Первые 3 карточки — eager, остальные — lazy
+    const isEager = index < 3;
+
+    // Валидация ссылки: если пустая или '#' — рендерим <div>, иначе <a>
+    const hasLink = isValidLink(item.link);
+    const card = document.createElement(hasLink ? 'a' : 'div');
+    card.className = 'card card--project';
+
+    if (hasLink) {
+      card.href = item.link;
+      if (hasValue(item.title)) {
+        card.setAttribute('aria-label', `Открыть кейс: ${item.title}`);
+      }
+    }
+
+    // Обёртка картинки
+    const imageWrap = document.createElement('div');
+    imageWrap.className = 'card__image-wrap';
+
+    const img = document.createElement('img');
+    if (hasValue(item.src)) img.src   = item.src;
+    if (hasValue(item.alt)) img.alt   = item.alt;
+    else                    img.alt   = '';
+    img.width   = 658;
+    img.height  = 352;
+    img.loading = isEager ? 'eager' : 'lazy';
+
+    imageWrap.appendChild(img);
+    card.appendChild(imageWrap);
+
+    // Подпись проекта
+    const info = document.createElement('div');
+    info.className = 'card__project-info';
+
+    if (hasValue(item.title)) {
+      const h3 = document.createElement('h3');
+      h3.className = 'card__title';
+      h3.textContent = item.title;
+      info.appendChild(h3);
+    }
+
+    card.appendChild(info);
+    container.appendChild(card);
+  });
+
+  updateProjectsCardWidth();
+}
+
+
+
+
+// ============================================================================
+// ДИНАМИЧЕСКАЯ ШИРИНА КАРТОЧЕК ПРОЕКТОВ (ДЕСКТОП)
+// ============================================================================
+
+function updateProjectsCardWidth() {
+  // Только десктоп
+  if (window.innerWidth <= 1080) return;
+
+  const zone = document.getElementById('zone-projects');
+  const container = document.getElementById('projects-cards-container');
+  if (!zone || !container) return;
+
+  const cards = container.querySelectorAll('.card--project');
+  if (cards.length === 0) return;
+
+  const zoneHeight = zone.offsetHeight;
+  if (zoneHeight === 0) return;
+
+  // Высота подписи (берём первую карточку)
+  const firstCard = cards[0];
+  const caption = firstCard.querySelector('.card__project-info');
+  let captionHeight = 60;
+  if (caption) {
+    captionHeight = caption.offsetHeight || 60;
+    captionHeight += 44; // небольшой запас
+  }
+
+  const imageHeight = zoneHeight - captionHeight;
+  if (imageHeight <= 0) return;
+
+  // Пропорция 658/352
+  const cardWidth = imageHeight * (658 / 352);
+
+  cards.forEach(card => {
+    card.style.width = cardWidth + 'px';
+    card.style.height = zoneHeight + 'px';
+
+    const imageWrap = card.querySelector('.card__image-wrap');
+    if (imageWrap) {
+      imageWrap.style.width = '100%';
+      imageWrap.style.height = imageHeight + 'px';
+      imageWrap.style.flex = 'none';
+    }
+  });
+}
+
+// Вызов после рендера проектов
+// В конце функции renderProjects() добавьте:
+// updateProjectsCardWidth();
+
+// Обработчик resize с debounce
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(updateProjectsCardWidth, 150);
+});
+
+// Вызов при загрузке после рендера
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(updateProjectsCardWidth, 200);
+});
+
+
 
 
 
@@ -948,74 +1183,6 @@ function initPoetryExpand() {
     }
   });
 })();
-
-
-/* ═══════════════════════════════════════════════════════════════════════════════
-   ДЕСКТОПНЫЙ ZOOM ДЛЯ КАРТОЧЕК КРАФТА (только экраны ≥ 1081px)
-   ═══════════════════════════════════════════════════════════════════════════════ */
-
-function initArtZoom() {
-  // Только десктоп
-  if (!window.matchMedia('(min-width: 1081px)').matches) return;
-
-  const craftContainer = document.getElementById('craft-cards-container');
-  if (!craftContainer) return;
-
-  const cards = craftContainer.querySelectorAll('.card--craft');
-  if (cards.length === 0) return;
-
-  cards.forEach((card) => {
-    const img = card.querySelector('.card__image-wrap img');
-    if (!img) return;
-
-    // Удаляем старые обработчики, если они были (защита от дублирования)
-    card.removeEventListener('mouseenter', card._zoomEnter);
-    card.removeEventListener('mousemove', card._zoomMove);
-    card.removeEventListener('mouseleave', card._zoomLeave);
-
-    // Функция-обработчик входа мыши
-    const onEnter = () => {
-      card.classList.add('is-zoomed');
-    };
-
-    // Функция-обработчик движения мыши
-    const onMove = (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left; // позиция мыши относительно левого края карточки
-      const width = rect.width;
-      const ratio = Math.min(Math.max(x / width, 0), 1); // 0..1
-
-      // Слепая зона: первые 15% слева — без зума
-      let scale = 1;
-      if (ratio < 0.4) {
-        // От 0.15 до 1.0 масштаб линейно растёт от 1.0 до 1.6
-        const t = (ratio) / 0.4; // 0..1
-        scale = 1 + (1 - t) * 1; // 1.0 .. 1.8
-      }
-
-      img.style.transform = `scale(${scale})`;
-    };
-
-    // Функция-обработчик ухода мыши
-    const onLeave = () => {
-      card.classList.remove('is-zoomed');
-      img.style.transform = ''; // сброс к базовому
-    };
-
-    // Сохраняем ссылки на функции, чтобы потом удалить
-    card._zoomEnter = onEnter;
-    card._zoomMove = onMove;
-    card._zoomLeave = onLeave;
-
-    // Навешиваем события
-    card.addEventListener('mouseenter', onEnter);
-    card.addEventListener('mousemove', onMove);
-    card.addEventListener('mouseleave', onLeave);
-  });
-}
-
-
-
 
 
 /* =============================================================================

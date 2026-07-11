@@ -102,9 +102,8 @@
 
 .hero-signature {
   width:      auto;
-  max-width:  600px;
+  max-width:  500px;
   height:     auto;
-  max-height: 240px;
   object-fit: contain;
 }
 
@@ -333,6 +332,7 @@
 
 .card--project {
   flex:             0 0 auto;
+  height:           100%;
   display:          flex;
   flex-direction:   column;
   cursor:           pointer;
@@ -340,11 +340,10 @@
   will-change:      transform;
   transition:       transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   margin-right:     4px;
-  height:           auto;
 }
 
 .card--project:hover {
-  transform:        translateY(-44px);
+  transform:        translateY(-46px);
 }
 
 .card--project:first-child {
@@ -356,8 +355,6 @@
 }
 
 .card--project .card__image-wrap {
-  width:            658px;
-  height:           352px;
   overflow:         hidden;
   background-color: var(--bg-image-cover);
 }
@@ -384,6 +381,10 @@
   line-height:  var(--text-title-lh);
   font-weight:  300;
   color:        var(--text-default);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .card__project-info .card__date {
@@ -558,7 +559,7 @@ body.active-poetry .zone--poetry {
     --text-mono-lh:     1.3;
     --header-height:    64px;
     --footer-height:    79px;
-    --projects-height:  264px;
+    /* ── --projects-height:  264px; ── */
   }
 
   img {
@@ -625,16 +626,17 @@ body.active-poetry .zone--poetry {
   .site-center {
     position: fixed;
     top: var(--header-height);
-    height: calc(100vh - var(--header-height) - var(--footer-height) - var(--projects-height));
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height) - var(--footer-height) - (88vw * 0.535 + 116px));
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
     pointer-events: auto;
-    width:  100%;
-    left: 0;
     padding: 0 20px;
+    text-align: center;
   }
 
   .hero-signature {
@@ -644,19 +646,21 @@ body.active-poetry .zone--poetry {
 
   /* ── Основной layout ── */
   .site-main {
-    display: block;
-    margin-top: var(--header-height);
-    margin-bottom: var(--footer-height);
+    display: block;        /* или просто убрать display: flex */
+    height: auto;
+    min-height: auto;
+    overflow: visible;
+    grid-template-columns: none;
   }
 
 
   /* ── Зона проектов ── */
   .zone--projects {
-    position:   fixed;
-    bottom:     var(--footer-height);
-    left:       0;
-    width:      100vw;
-    height:     var(--projects-height);
+    position: fixed; 
+    bottom: var(--footer-height);
+    left: 0;
+    width: 100%;
+    height: calc(88vw * 0.535 + 116px);        
     opacity:    1;
     transform:  none;
     z-index:    10;
@@ -684,6 +688,7 @@ body.active-poetry .zone--poetry {
     flex-direction:   row;
     flex-wrap:        nowrap;
     width:            100%;
+    height:           auto;
     overflow-x:       auto !important;
     overflow-y:       visible;
     -webkit-overflow-scrolling: touch;
@@ -703,10 +708,9 @@ body.active-poetry .zone--poetry {
 
   .card--project {
     flex:         0 0 auto;
-    width:        auto;
     margin-right: 0;
     transform:    none !important;
-    transition:   none !important;
+    transition:   none !important
   }
 
   .card--project:hover {
@@ -716,6 +720,7 @@ body.active-poetry .zone--poetry {
   .card--project .card__image-wrap {
     width:  88vw;
     height: calc(88vw * 0.535);
+    flex: none;
   }
 
   .card--project:first-child {
@@ -740,8 +745,11 @@ body.active-poetry .zone--poetry {
     line-height: 1.3;
     padding-left: 0;
     max-width: 100%;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     overflow: hidden;
-    white-space: nowrap;
+    white-space: normal;
     text-overflow: ellipsis;
   }
 
@@ -750,7 +758,7 @@ body.active-poetry .zone--poetry {
     position:         fixed;
     top:              0;
     left:             0;
-    width:            85vw;
+    width:            100vw;
     height:           100vh;
     z-index:          var(--z-sheet);
     background-color: var(--bg-default);
@@ -774,9 +782,9 @@ body.active-poetry .zone--poetry {
   .zone--poetry {
     position:         fixed;
     top:              0;
-    left:             15vw !important;
+    left:             0vw !important;
     right:            auto !important;
-    width:            85vw;
+    width:            100vw;
     height:           100vh;
     z-index:          var(--z-sheet);
     background-color: var(--bg-default);
@@ -1066,3 +1074,12 @@ body.active-poetry .zone--poetry {
   }
 
 } /* конец медиа-запроса */
+
+
+
+/* ── Планшеты (только уменьшение карточек и подписи) ── */
+@media (min-width: 600px) and (max-width: 1080px) {
+  .hero-signature {
+    max-width: 70%;
+  }
+}
