@@ -263,8 +263,8 @@
 
 .card__poetry-header .card__title {
   font-family:  var(--font-serif);
-  font-size:    var(--text-title-size);
-  line-height:  var(--text-title-lh);
+  font-size:    var(--text-p-size);
+  line-height:  var(--text-p-lh);
   font-weight:  300;
   color:        var(--text-default);
   display:      block;
@@ -907,7 +907,7 @@ body.active-poetry .projects-cards-container {
     width:           100%;
     height:          auto;
     opacity:         1;
-    padding:         8px 12px 24px;
+    padding:         6px 12px 20px;
     gap:             12px;
   }
 
