@@ -47,6 +47,15 @@ function renderPlaceholder(container) {
   container.appendChild(p);
 }
 
+let lastMouseX = 0;
+let lastMouseY = 0;
+
+document.addEventListener('mousemove', (e) => {
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+}, { passive: true });
+
+
 
 /* ─── Запуск рендера — все три зоны параллельно ──────────────────────────────── */
 // Promise.allSettled гарантирует: даже если один fetch упадёт,
@@ -270,12 +279,19 @@ function activateZone(zone, options = {}) {
  * Деактивирует все зоны: снимает active-классы, очищает хэш.
  */
 function deactivateAllZones() {
+  // Сначала снимаем активные классы (они убирают opacity:1)
   ['active-craft', 'active-poetry', 'active-projects'].forEach(cls =>
     document.body.classList.remove(cls)
   );
+
+  // Через requestAnimationFrame убираем ховеры, чтобы переход успел сработать
+  requestAnimationFrame(() => {
+    ['zone-hovered--craft', 'zone-hovered--poetry', 'zone-hovered--projects'].forEach(cls =>
+      document.body.classList.remove(cls)
+    );
+  });
+
   history.replaceState(null, '', window.location.pathname);
-  // Принудительно возвращаем дефолтное состояние фокуса на проекты
-  document.body.classList.add('zone-hovered--projects');
 }
 
 (function initDeepLinking() {
@@ -288,28 +304,7 @@ function deactivateAllZones() {
 
   if (!zoneCraft || !zonePoetry) return;
 
-  function bindZoneClick(zoneEl, zoneName) {
-    zoneEl.addEventListener('click', (e) => {
-      // Клик по кнопке раскрытия стиха — не переключаем зону
-      if (e.target.closest('.poetry-toggle-btn')) return;
-
-      const activeClass    = `active-${zoneName}`;
-      const isAlreadyActive = document.body.classList.contains(activeClass);
-
-      if (isAlreadyActive) {
-        // Повторный клик — снимаем фиксацию
-        deactivateAllZones();
-      } else {
-        // Активируем зону: тоже снимает все остальные активные классы
-        activateZone(zoneName);
-      }
-    });
-  }
-
-  bindZoneClick(zoneCraft,    'craft');
-  bindZoneClick(zonePoetry,   'poetry');
-
-  // --- НОВОЕ: клики по кнопкам шапки (только на десктопе) ---
+  // --- Клики по кнопкам шапки (только на десктопе) ---
   if (window.matchMedia('(min-width: 1081px)').matches) {
     if (btnCraft) {
       btnCraft.addEventListener('click', (e) => {
@@ -336,23 +331,28 @@ function deactivateAllZones() {
     }
   }
 
-  // Клик за пределами активной боковой зоны снимает фиксацию
-  document.addEventListener('click', (e) => {
-    // Проверяем, зафиксирована ли сейчас вообще какая-либо боковая зона
-    const hasActiveZone = document.body.classList.contains('active-craft') || 
-                          document.body.classList.contains('active-poetry');
-                          
-    if (!hasActiveZone) return;
+  // Глобальный обработчик для снятия фиксации при клике вне боковых зон (только десктоп)
+  if (window.matchMedia('(min-width: 1081px)').matches) {
+    document.addEventListener('click', (e) => {
+      const isCraftActive = document.body.classList.contains('active-craft');
+      const isPoetryActive = document.body.classList.contains('active-poetry');
+      if (!isCraftActive && !isPoetryActive) return;
 
-    // Если клик пришелся на центральный блок, шапку или футер — снимаем фиксацию
-    const clickedOutside = e.target.closest('.site-center') || 
-                           e.target.closest('.site-header') || 
-                           e.target.closest('.site-footer');
+      const clickedInsideCraft = !!e.target.closest('.zone--craft');
+      const clickedInsidePoetry = !!e.target.closest('.zone--poetry');
+      const clickedOnCraftBtn = !!e.target.closest('.header-zone-btn--craft');
+      const clickedOnPoetryBtn = !!e.target.closest('.header-zone-btn--poetry');
+      const clickedOnProjectCard = !!e.target.closest('.card--project');
+      if (clickedOnProjectCard) return; // обрабатывается в initProjectSheet
 
-    if (clickedOutside) {
-      deactivateAllZones();
-    }
-  });
+      // Если клик не внутри зоны и не по кнопке — снимаем фиксацию
+      if (!clickedInsideCraft && !clickedInsidePoetry && !clickedOnCraftBtn && !clickedOnPoetryBtn) {
+        deactivateAllZones();
+      }
+    });
+  }
+
+  
 })();
 
 
@@ -662,56 +662,93 @@ function initArtZoom() {
   if (!craftContainer) return;
 
   const cards = craftContainer.querySelectorAll('.card--craft');
+  const allCards = cards; // сохраняем для использования в скролле
   if (cards.length === 0) return;
+
+  const craftZone = document.getElementById('zone-craft');
+  let scrollTimer = null;
+
+  // Функция для применения зума к одной карточке по координатам мыши
+  function applyZoomToCard(card, x, y) {
+    if (!card) return;
+    const img = card.querySelector('.card__image-wrap img');
+    if (!img) return;
+
+    const rect = card.getBoundingClientRect();
+    const mouseX = x - rect.left;
+    const width = rect.width;
+    const ratio = Math.min(Math.max(mouseX / width, 0), 1);
+
+    let scale = 1;
+    if (ratio < 0.4) {
+      const t = ratio / 0.4;
+      scale = 1 + (1 - t) * 1;
+    }
+
+    if (scale > 1) {
+      card.classList.add('is-zoomed');
+    } else {
+      card.classList.remove('is-zoomed');
+    }
+    img.style.transform = `scale(${scale})`;
+  }
 
   cards.forEach((card) => {
     const img = card.querySelector('.card__image-wrap img');
     if (!img) return;
 
-    // Удаляем старые обработчики, если они были (защита от дублирования)
+    // Удаляем старые обработчики
     card.removeEventListener('mouseenter', card._zoomEnter);
     card.removeEventListener('mousemove', card._zoomMove);
     card.removeEventListener('mouseleave', card._zoomLeave);
 
-    // Функция-обработчик входа мыши
     const onEnter = () => {
-      card.classList.add('is-zoomed');
+      applyZoomToCard(card, lastMouseX, lastMouseY);
     };
 
-    // Функция-обработчик движения мыши
     const onMove = (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left; // позиция мыши относительно левого края карточки
-      const width = rect.width;
-      const ratio = Math.min(Math.max(x / width, 0), 1); // 0..1
-
-      // Слепая зона: первые 15% слева — без зума
-      let scale = 1;
-      if (ratio < 0.4) {
-        // От 0.15 до 1.0 масштаб линейно растёт от 1.0 до 1.6
-        const t = (ratio) / 0.4; // 0..1
-        scale = 1 + (1 - t) * 1; // 1.0 .. 1.8
-      }
-
-      img.style.transform = `scale(${scale})`;
+      applyZoomToCard(card, e.clientX, e.clientY);
     };
 
-    // Функция-обработчик ухода мыши
     const onLeave = () => {
       card.classList.remove('is-zoomed');
-      img.style.transform = ''; // сброс к базовому
+      img.style.transform = '';
     };
 
-    // Сохраняем ссылки на функции, чтобы потом удалить
     card._zoomEnter = onEnter;
     card._zoomMove = onMove;
     card._zoomLeave = onLeave;
 
-    // Навешиваем события
     card.addEventListener('mouseenter', onEnter);
     card.addEventListener('mousemove', onMove);
     card.addEventListener('mouseleave', onLeave);
   });
+
+  // Обработчик скролла с debounce 100ms
+  if (craftZone) {
+    craftZone.addEventListener('scroll', () => {
+      clearTimeout(scrollTimer);
+      scrollTimer = setTimeout(() => {
+        // Находим элемент под курсором
+        const el = document.elementFromPoint(lastMouseX, lastMouseY);
+        const cardUnderCursor = el ? el.closest('.card--craft') : null;
+
+        // Сбрасываем зум у всех карточек
+        allCards.forEach(c => {
+          const imgEl = c.querySelector('.card__image-wrap img');
+          if (imgEl) {
+            c.classList.remove('is-zoomed');
+            imgEl.style.transform = '';
+          }
+        });
+
+        // Если под курсором есть карточка — применяем зум к ней
+        if (cardUnderCursor) {
+          applyZoomToCard(cardUnderCursor, lastMouseX, lastMouseY);
+        }
+      }, 150);
+    });
+  }
 }
 
 
@@ -1185,70 +1222,3 @@ document.addEventListener('DOMContentLoaded', () => {
 })();
 
 
-/* =============================================================================
-   MOBILE ADAPTIVE — Поэзия: тап раскрывает стих (без ховера)
-   Переопределяет десктопный initPoetryExpand для мобайла.
-   Вызывается ПОСЛЕ renderPoetry() через тот же initPoetryExpand() —
-   мобильная ветка добавляется в конец той же функции через guard.
-   ============================================================================= */
-
-/**
- * Патч initPoetryExpand для мобайла:
- * убираем mouseenter/mouseleave-таймеры, добавляем тап по карточке.
- * Вызывается автоматически из renderPoetry() → initPoetryExpand().
- * Мобильная логика внедрена через проверку внутри той же функции.
- 
-(function patchPoetryForMobile() {
-  if (window.innerWidth > 1080) return;
-
-  // Перехватываем оригинальную initPoetryExpand и патчим её поведение.
-  // Так как renderPoetry() уже вызвала initPoetryExpand() к этому моменту,
-  // нам нужно дополнить уже навешанные карточки мобильным тап-слушателем.
-
-  const poetryContainer = document.getElementById('poetry-cards-container');
-  if (!poetryContainer) return;
-
-  // Ждём, когда renderPoetry() завершит рендер (Promise.allSettled выше)
-  // Используем MutationObserver для надёжного ожидания карточек
-  function patchCards() {
-    const cards = poetryContainer.querySelectorAll('.card--poetry');
-    if (cards.length === 0) return;
-
-    cards.forEach(card => {
-      const btnEl = card.querySelector('.poetry-toggle-btn');
-      if (!btnEl) return;
-
-      // Тап по карточке (не по кнопке) — разворачивает стих мгновенно
-      // Повторный тап НЕ сворачивает (по ТЗ: «больше не сворачивается»)
-      card.addEventListener('click', (e) => {
-        // Если тап по кнопке — она сама обработает через десктопный обработчик
-        if (e.target.closest('.poetry-toggle-btn')) return;
-
-        if (!card.classList.contains('is-expanded')) {
-          // Раскрываем: тот же механизм, что на десктопе
-          const textEl = card.querySelector('.card__poetry-text');
-          card.classList.add('is-expanded');
-          btnEl.setAttribute('aria-expanded', 'true');
-          btnEl.textContent = '[скрыть]';
-          if (textEl) textEl.style.maxHeight = textEl.scrollHeight + 'px';
-        }
-      });
-    });
-  }
-
-  // Если карточки уже в DOM — патчим сразу
-  if (poetryContainer.querySelectorAll('.card--poetry').length > 0) {
-    patchCards();
-    return;
-  }
-
-  // Иначе — ждём через MutationObserver
-  const observer = new MutationObserver(() => {
-    if (poetryContainer.querySelectorAll('.card--poetry').length > 0) {
-      observer.disconnect();
-      patchCards();
-    }
-  });
-  observer.observe(poetryContainer, { childList: true });
-})();
-*/

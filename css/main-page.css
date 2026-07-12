@@ -157,12 +157,12 @@
 }
 
 .card--craft .card__image-wrap img {
-  width:           100%;
-  height:          100%;
-  object-fit:      contain;
-  object-position: top center;
-  transition:      transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-  will-change:     transform;
+  width:            100%;
+  height:           100%;
+  object-fit:       contain;
+  object-position:  top center;
+  transition:       transform 0.2s cubic-bezier(0.25, 1.1, 0.5, 0.9);
+  will-change:      transform;
   transform-origin: left center;
 }
 
@@ -327,7 +327,7 @@
   height:           100%;
   align-items:      flex-start;
   width:            max-content;
-  transition:       var(--transition-transform-smooth-scroll);
+  transition:       var(--transition-transform-smooth-scroll), var(--transition-opacity);
 }
 
 .card--project {
@@ -408,11 +408,8 @@ body.zone-hovered--craft .zone--craft {
     rgba(255, 255, 255, 1) 100%
   );
 }
-body.zone-hovered--craft .zone--poetry {
-  opacity:        0.15 !important;
-  pointer-events: none;
-}
-body.zone-hovered--craft .zone--projects {
+
+body.zone-hovered--craft .projects-cards-container {
   opacity:        0.10 !important;
   pointer-events: none;
 }
@@ -427,11 +424,8 @@ body.zone-hovered--poetry .zone--poetry {
     rgba(255, 255, 255, 1) 100%
   );
 }
-body.zone-hovered--poetry .zone--craft {
-  opacity:        0.15 !important;
-  pointer-events: none;
-}
-body.zone-hovered--poetry .zone--projects {
+
+body.zone-hovered--poetry .projects-cards-container {
   opacity:        0.10 !important;
   pointer-events: none;
 }
@@ -439,6 +433,7 @@ body.zone-hovered--poetry .zone--projects {
 body.zone-hovered--projects .zone--projects {
   opacity:          1 !important;
 }
+
 body.zone-hovered--projects .zone--craft,
 body.zone-hovered--projects .zone--poetry {
   opacity:        0.15 !important;
@@ -488,9 +483,7 @@ body.active-projects .zone--projects {
 }
 
 body.active-craft   .zone--poetry,
-body.active-craft   .zone--projects,
 body.active-poetry  .zone--craft,
-body.active-poetry  .zone--projects,
 body.active-projects .zone--craft,
 body.active-projects .zone--poetry {
   opacity:        0.15;
@@ -535,9 +528,12 @@ body.active-poetry .zone--poetry {
   );
 }
 
-
-/* ─── 11. Проектная панель (Sheet) ───────────────────────────────────────────── */
-/* стили уже в global.css */
+body.active-craft .projects-cards-container,
+body.active-poetry .projects-cards-container {
+  opacity: 0.15;
+  transition: opacity 0.2s ease-in-out;
+  pointer-events: none;
+}
 
 
 
@@ -628,7 +624,7 @@ body.active-poetry .zone--poetry {
     top: var(--header-height);
     left: 0;
     width: 100%;
-    height: calc(100vh - var(--header-height) - var(--footer-height) - (88vw * 0.535 + 116px));
+    height: calc(100vh - var(--header-height) - var(--footer-height) - (88vw * 0.535 + 118px));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -640,7 +636,7 @@ body.active-poetry .zone--poetry {
   }
 
   .hero-signature {
-    max-width:  100%;
+    max-width:  96%;
     max-height: auto;
   }
 
@@ -660,7 +656,7 @@ body.active-poetry .zone--poetry {
     bottom: var(--footer-height);
     left: 0;
     width: 100%;
-    height: calc(88vw * 0.535 + 116px);        
+    height: calc(88vw * 0.535 + 118px);        
     opacity:    1;
     transform:  none;
     z-index:    10;
@@ -736,7 +732,7 @@ body.active-poetry .zone--poetry {
   }
 
   .card__project-info {
-    padding: 10px 16px 8px;
+    padding: 10px 16px 10px;
     width:   88vw;
   }
 
@@ -751,6 +747,7 @@ body.active-poetry .zone--poetry {
     overflow: hidden;
     white-space: normal;
     text-overflow: ellipsis;
+
   }
 
   /* ── Офф-канвас панели (Крафт и Поэзия) ── */
@@ -910,7 +907,7 @@ body.active-poetry .zone--poetry {
     width:           100%;
     height:          auto;
     opacity:         1;
-    padding:         8px 12px 12px;
+    padding:         8px 12px 24px;
     gap:             12px;
   }
 
@@ -929,7 +926,7 @@ body.active-poetry .zone--poetry {
 
   .card-caption-craft .card__title {
     -webkit-line-clamp: unset;
-    line-clamp: unset;
+    line-clamp:         unset;
     display:            block;
     overflow:           visible;
     width:              100%;
@@ -1080,6 +1077,6 @@ body.active-poetry .zone--poetry {
 /* ── Планшеты (только уменьшение карточек и подписи) ── */
 @media (min-width: 600px) and (max-width: 1080px) {
   .hero-signature {
-    max-width: 70%;
+    max-width:  400px;
   }
 }
