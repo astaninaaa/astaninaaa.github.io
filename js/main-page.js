@@ -199,6 +199,36 @@ Promise.allSettled([
   if (!zoneProjects || !container) return;
 
   let currentTranslateX = 0;
+  let rafId = null;
+  let pendingDelta = 0;
+
+  function applyScroll() {
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+
+    rafId = requestAnimationFrame(() => {
+      const zoneWidth = zoneProjects.offsetWidth;
+      const containerWidth = container.scrollWidth;
+      const maxScroll = containerWidth - zoneWidth;
+      if (maxScroll <= 0) {
+        rafId = null;
+        return;
+      }
+
+      // Применяем накопленную дельту
+      currentTranslateX += pendingDelta;
+      pendingDelta = 0;
+
+      // Ограничиваем
+      if (currentTranslateX > 0) currentTranslateX = 0;
+      if (currentTranslateX < -maxScroll) currentTranslateX = -maxScroll;
+
+      container.style.transform = `translateX(${currentTranslateX}px)`;
+      rafId = null;
+    });
+  }
 
   document.addEventListener('wheel', (e) => {
     // 1. Если активна боковая зона — проекты не скроллятся
@@ -209,6 +239,9 @@ Promise.allSettled([
     // 2. Если курсор над кнопкой шапки — скроллим соответствующую зону
     const btnCraft = e.target.closest('.header-zone-btn--craft');
     const btnPoetry = e.target.closest('.header-zone-btn--poetry');
+
+    const SMOOTH_FACTOR = 0.2; // меньше 1 — медленнее, больше 1 — быстрее
+    pendingDelta -= e.deltaY * SMOOTH_FACTOR;
 
     if (btnCraft) {
       const zone = document.getElementById('zone-craft');
@@ -232,22 +265,32 @@ Promise.allSettled([
     const target = e.target.closest('.zone--craft, .zone--poetry');
     if (target) return;
 
-    // 4. В остальных случаях — скроллим проекты
+    // 4. В остальных случаях — скроллим проекты через rAF
     if (e.deltaY !== 0) {
       e.preventDefault();
+      pendingDelta -= e.deltaY; // накапливаем дельту
+      applyScroll();
+    }
+  }, { passive: false });
 
+  // При ресайзе пересчитываем размеры и корректируем позицию
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      updateProjectsCardWidth();
       const zoneWidth = zoneProjects.offsetWidth;
       const containerWidth = container.scrollWidth;
       const maxScroll = containerWidth - zoneWidth;
-      if (maxScroll <= 0) return;
-
-      currentTranslateX -= e.deltaY;
-      if (currentTranslateX > 0) currentTranslateX = 0;
-      if (currentTranslateX < -maxScroll) currentTranslateX = -maxScroll;
-
-      container.style.transform = `translateX(${currentTranslateX}px)`;
-    }
-  }, { passive: false });
+      if (currentTranslateX < -maxScroll) {
+        currentTranslateX = -maxScroll;
+        container.style.transform = `translateX(${currentTranslateX}px)`;
+      } else if (currentTranslateX > 0) {
+        currentTranslateX = 0;
+        container.style.transform = `translateX(0px)`;
+      }
+    }, 150);
+  });
 })();
 
 
@@ -264,13 +307,10 @@ Promise.allSettled([
  */
 function activateZone(zone, options = {}) {
   const ZONE_CLASSES = ['active-craft', 'active-poetry', 'active-projects'];
-
   // Снимаем все активные классы
   ZONE_CLASSES.forEach(cls => document.body.classList.remove(cls));
-
   // Навешиваем нужный
   document.body.classList.add(`active-${zone}`);
-
   // Записываем хэш в URL без перезагрузки страницы
   history.replaceState(null, '', `#${zone}`);
 }
@@ -279,19 +319,31 @@ function activateZone(zone, options = {}) {
  * Деактивирует все зоны: снимает active-классы, очищает хэш.
  */
 function deactivateAllZones() {
-  // Сначала снимаем активные классы (они убирают opacity:1)
+  // Снимаем активные классы
   ['active-craft', 'active-poetry', 'active-projects'].forEach(cls =>
     document.body.classList.remove(cls)
   );
-
-  // Через requestAnimationFrame убираем ховеры, чтобы переход успел сработать
-  requestAnimationFrame(() => {
-    ['zone-hovered--craft', 'zone-hovered--poetry', 'zone-hovered--projects'].forEach(cls =>
-      document.body.classList.remove(cls)
-    );
-  });
-
+  // Очищаем все классы ховеров
+  ['zone-hovered--craft', 'zone-hovered--poetry', 'zone-hovered--projects'].forEach(cls =>
+    document.body.classList.remove(cls)
+  );
   history.replaceState(null, '', window.location.pathname);
+
+  // Проверяем положение мыши и, если она над кнопкой или зоной, добавляем соответствующий ховер
+  requestAnimationFrame(() => {
+    if (lastMouseX === 0 && lastMouseY === 0) return;
+    const el = document.elementFromPoint(lastMouseX, lastMouseY);
+    if (!el) return;
+
+    const craftZone = el.closest('.zone--craft') || el.closest('.header-zone-btn--craft');
+    const poetryZone = el.closest('.zone--poetry') || el.closest('.header-zone-btn--poetry');
+
+    if (craftZone) {
+      document.body.classList.add('zone-hovered--craft');
+    } else if (poetryZone) {
+      document.body.classList.add('zone-hovered--poetry');
+    }
+  });
 }
 
 (function initDeepLinking() {
@@ -343,10 +395,15 @@ function deactivateAllZones() {
       const clickedOnCraftBtn = !!e.target.closest('.header-zone-btn--craft');
       const clickedOnPoetryBtn = !!e.target.closest('.header-zone-btn--poetry');
       const clickedOnProjectCard = !!e.target.closest('.card--project');
-      if (clickedOnProjectCard) return; // обрабатывается в initProjectSheet
 
-      // Если клик не внутри зоны и не по кнопке — снимаем фиксацию
-      if (!clickedInsideCraft && !clickedInsidePoetry && !clickedOnCraftBtn && !clickedOnPoetryBtn) {
+      // Игнорируем клики по карточкам проектов (они обрабатываются в initProjectSheet)
+      if (clickedOnProjectCard) return;
+
+      // Игнорируем клики по кнопкам шапки (они управляются отдельными обработчиками)
+      if (clickedOnCraftBtn || clickedOnPoetryBtn) return;
+
+      // Если клик вне зоны — снимаем фиксацию
+      if (!clickedInsideCraft && !clickedInsidePoetry) {
         deactivateAllZones();
       }
     });
@@ -1037,7 +1094,7 @@ function updateProjectsCardWidth() {
   const cards = container.querySelectorAll('.card--project');
   if (cards.length === 0) return;
 
-  const zoneHeight = zone.offsetHeight;
+  const zoneHeight = Math.round(zone.offsetHeight);
   if (zoneHeight === 0) return;
 
   // Высота подписи (берём первую карточку)
@@ -1049,11 +1106,11 @@ function updateProjectsCardWidth() {
     captionHeight += 44; // небольшой запас
   }
 
-  const imageHeight = zoneHeight - captionHeight;
+  const imageHeight = Math.round(zoneHeight - captionHeight);
   if (imageHeight <= 0) return;
 
   // Пропорция 658/352
-  const cardWidth = imageHeight * (658 / 352);
+  const cardWidth = Math.round(imageHeight * (658 / 352));
 
   cards.forEach(card => {
     card.style.width = cardWidth + 'px';
@@ -1061,9 +1118,7 @@ function updateProjectsCardWidth() {
 
     const imageWrap = card.querySelector('.card__image-wrap');
     if (imageWrap) {
-      imageWrap.style.width = '100%';
       imageWrap.style.height = imageHeight + 'px';
-      imageWrap.style.flex = 'none';
     }
   });
 }
@@ -1072,17 +1127,7 @@ function updateProjectsCardWidth() {
 // В конце функции renderProjects() добавьте:
 // updateProjectsCardWidth();
 
-// Обработчик resize с debounce
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(updateProjectsCardWidth, 150);
-});
 
-// Вызов при загрузке после рендера
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(updateProjectsCardWidth, 200);
-});
 
 
 
@@ -1117,13 +1162,20 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function closeAllPanels() {
-    if (zoneCraft)  zoneCraft.classList.remove('is-open');
+    let activeBtn = null;
+    if (zoneCraft && zoneCraft.classList.contains('is-open')) {
+      activeBtn = btnCraft;
+    } else if (zonePoetry && zonePoetry.classList.contains('is-open')) {
+      activeBtn = btnPoetry;
+    }
+
+    if (zoneCraft) zoneCraft.classList.remove('is-open');
     if (zonePoetry) zonePoetry.classList.remove('is-open');
     hideOverlay();
     history.replaceState(null, '', window.location.pathname);
-    // Сбрасываем aria-expanded для обеих кнопок
     if (btnCraft)  btnCraft.setAttribute('aria-expanded', 'false');
     if (btnPoetry) btnPoetry.setAttribute('aria-expanded', 'false');
+    if (activeBtn) setTimeout(() => activeBtn.focus(), 0);
   }
 
   /** Открытие конкретной панели с выводом оверлея */
@@ -1134,6 +1186,10 @@ document.addEventListener('DOMContentLoaded', () => {
     showOverlay();
     history.replaceState(null, '', hash);
     setAriaExpanded(panelEl, true);
+
+    // Убираем aria-hidden у заголовка панели, чтобы фокус был доступен
+    const closeBtn = panelEl.querySelector('.panel-close-btn');
+    if (closeBtn) setTimeout(() => closeBtn.focus(), 0);
   }
 
   /* ── Тапы по кнопкам в Шапке ── */
