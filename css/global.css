@@ -9,10 +9,10 @@
   --bg-default:        #FFFFFF;
   --bg-muted:          #F3EFEF;
   --bg-image-cover:    #F3EFEF;
-  --bg-footer:         #1C191C;
-  --overlay:           rgba(101, 90, 108, 0.4);
+  --bg-footer:         #14006e;
+  --overlay:           rgba(26, 23, 40, 0.4);
   --border-default:    #ebe8e8;
-  --text-default:      #292429;
+  --text-default:      #14123B;
   --text-hover:        #000000;
   --text-footer:       #FFFFFF;
 
@@ -48,7 +48,7 @@
   --z-projects: 10;
   --z-header:   30;
   --z-footer:   30;
-  --z-active:   40;
+  --z-active:   30;
   --z-sheet:    40;
   --z-overlay:  35;
 }
@@ -223,8 +223,8 @@ button {
 }
 
 .header-logo img {
-  width:      56px;
-  height:     56px;
+  width:      74px;
+  height:     40px;
   object-fit: contain;
 }
 
