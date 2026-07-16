@@ -304,8 +304,8 @@
 
 .poetry-toggle-btn {
   display:          block;
-  color:            var(--text-default);
-  opacity:          0.65;
+  color:            var(--link-default);
+  opacity:          0.75;
   will-change:      opacity;
   transition:       opacity 0.2s ease-out;
   cursor:           pointer;

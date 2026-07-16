@@ -9,7 +9,9 @@
   --bg-default:        #FFFFFF;
   --bg-muted:          #F3EFEF;
   --bg-image-cover:    #F3EFEF;
-  --bg-footer:         #12015c;
+  --bg-footer:         #110350;
+  --link-default:      #041783;
+  --link-hover:        #12015c;
   --overlay:           rgba(26, 23, 40, 0.4);
   --border-default:    #ddddeb;
   --text-default:      #14123B;
@@ -25,6 +27,8 @@
   --text-title-size:   1.08rem;
   --text-title-lh:     1.45;
   --text-p-size:       1.15rem;
+  --text-footer-size:  1rem;
+  --text-footer-lh:    1;
   --text-p-lh:         1.8;
   --text-mono-size:    0.95rem;
   --text-mono-lh:      1.3;
@@ -94,6 +98,7 @@ img {
 a {
   color:           inherit;
   text-decoration: none;
+  font-weight:     300;
 }
 
 ul,
@@ -259,17 +264,19 @@ button {
 .footer-contacts {
   display:     flex;
   align-items: center;
-  gap:         16px;
+  gap:         24px;
 }
 
 .footer-link {
-  font-family:     var(--font-mono);
-  font-size:       var(--text-mono-size);
-  line-height:     var(--text-p-lh);
-  font-weight:     400;
+  font-family:     var(--font-serif);
+  font-size:       var(--text-footer-size);
+  line-height:     var(--text-footer-lh);
   color:           var(--text-footer);
   will-change:     opacity;
   transition:      var(--transition-opacity);
+  letter-spacing:  0.06em;
+  font-weight:     200;
+  padding-bottom:  4px;
 }
 
 .footer-link:hover {
