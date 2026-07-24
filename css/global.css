@@ -12,11 +12,19 @@
   --bg-footer:         #110350;
   --link-default:      #041783;
   --link-hover:        #12015c;
+  --bg-button-default: #27226d;
+  --bg-button-hover:   rgba(255,255,255,0.1);
+  --bg-button-active:  rgba(255,255,255,0.05);
+  --border-blue-light: #3c3c7e;
+  --border-blue-dark:  #08082b;
   --overlay:           rgba(26, 23, 40, 0.4);
   --border-default:    #ddddeb;
+  --border-inverse:    rgba(255, 255, 255, 0.15);
   --text-default:      #14123B;
   --text-hover:        #000000;
-  --text-footer:       #FFFFFF;
+  --text-footer:       rgba(255, 255, 255, 0.8);
+  --link-footer:       #FFFFFF;
+  --slider-thumb:      #FFFFFF;
 
   /* Шрифты */
   /*--font-serif:       'EB Garamond', Georgia, serif;  Старый вараинт */
@@ -27,11 +35,12 @@
   --text-title-size:   1.08rem;
   --text-title-lh:     1.45;
   --text-p-size:       1.15rem;
-  --text-footer-size:  1rem;
-  --text-footer-lh:    1;
   --text-p-lh:         1.8;
-  --text-mono-size:    0.95rem;
+  --text-mono-size:    0.96rem;
   --text-mono-lh:      1.3;
+  --text-mono-size-xs: 0.74rem;
+  --text-mono-size-xxs: 0.66rem;
+  --text-mono-lh-xs:   1.2;
 
   /* Размеры статичных якорей */
   --header-height:     64px;
@@ -53,7 +62,7 @@
   --z-header:   30;
   --z-footer:   30;
   --z-active:   30;
-  --z-sheet:    40;
+  --z-sheet:    5000;
   --z-overlay:  35;
 }
 
@@ -121,15 +130,15 @@ button {
 }
 
 .visually-hidden {
-  position:   absolute;
-  width:      1px;
-  height:     1px;
-  padding:    0;
-  margin:     -1px;
-  overflow:   hidden;
-  clip:       rect(0, 0, 0, 0);
+  position:     absolute;
+  width:        1px;
+  height:       1px;
+  padding:      0;
+  margin:       -1px;
+  overflow:     hidden;
+  clip:         rect(0, 0, 0, 0);
   white-space: nowrap;
-  border:     0;
+  border:      0;
 }
 
 .mono {
@@ -147,21 +156,16 @@ button {
   left:             0;
   width:            100vw;
   height:           var(--header-height);
-  background-color: var(--bg-default);
   z-index:          var(--z-header);
   opacity:          1;
 }
 
-.site-header::after {
-  content:        '';
-  position:       absolute;
-  top:            50%;
-  left:           0;
-  right:          0;
-  height:         1px;
-  background:     var(--border-default);
-  pointer-events: none;
-  z-index:        0;
+.header-divider {
+  flex: 1;
+  height: 1px;
+  background: var(--border-default);
+  align-self: center;
+  min-width: 0;
 }
 
 .header-nav {
@@ -175,15 +179,11 @@ button {
 }
 
 .header-zone-btn {
-  position:        absolute;
-  top:             50%;
-  transform:       translateY(-50%);
   display:         flex;
   align-items:     center;
   justify-content: center;
   cursor:          pointer;
   pointer-events:  auto;
-  background:      var(--bg-default);
   border:          none;
   padding:         16px 16px 2px;
   min-width:       65px;
@@ -221,7 +221,6 @@ button {
   align-items:     center;
   justify-content: center;
   flex-shrink:     0;
-  background:      var(--bg-default);
   padding:         0 10px 0 14px;
   position:        relative;
   z-index:         1;
@@ -231,65 +230,12 @@ button {
   width:      74px;
   height:     40px;
   object-fit: contain;
+  mix-blend-mode: multiply;
 }
 
 .header-zone-btn:hover .header-zone-icon {
   opacity: 0.8;
   transition: opacity 0.2s ease;
-}
-
-
-/* ─── 4. Футер (Footer) ─────────────────────────────────────────────────────── */
-.site-footer {
-  position:         fixed;
-  bottom:           0;
-  left:             0;
-  width:            100vw;
-  height:           var(--footer-height);
-  background-color: var(--bg-footer);
-  color:            var(--text-footer);
-  z-index:          var(--z-footer);
-  opacity:          1;
-}
-
-.footer-inner {
-  display:         flex;
-  align-items:     center;
-  justify-content: space-between;
-  width:           100%;
-  height:          100%;
-  padding:         0 40px;
-}
-
-.footer-contacts {
-  display:     flex;
-  align-items: center;
-  gap:         24px;
-}
-
-.footer-link {
-  font-family:     var(--font-serif);
-  font-size:       var(--text-footer-size);
-  line-height:     var(--text-footer-lh);
-  color:           var(--text-footer);
-  will-change:     opacity;
-  transition:      var(--transition-opacity);
-  letter-spacing:  0.06em;
-  font-weight:     200;
-  padding-bottom:  4px;
-}
-
-.footer-link:hover {
-  opacity: 0.7;
-}
-
-.footer-player {
-  color:          var(--text-footer);
-  letter-spacing: 0.02em;
-}
-
-.footer-timer {
-  color: var(--text-footer);
 }
 
 
@@ -311,75 +257,394 @@ button {
 }
 
 
-/* ─── 6. Панель проекта (Project Sheet) ─────────────────────────────────────── */
-.project-sheet {
+
+/* ─── 4. Футер (Footer) ─────────────────────────────────────────────────────── */
+.site-footer {
   position:         fixed;
   bottom:           0;
-  left:             var(--zone-craft-width);
-  width:            calc(100vw - var(--zone-craft-width) - var(--zone-poetry-width));
-  height:           calc(100vh - var(--header-height));
-  background-color: var(--bg-default);
-  z-index:          var(--z-sheet);
-  transform:        translateY(100%);
-  will-change:      transform;
-  transition:       transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-  overflow-y:       auto;
-  border-top:       1px solid var(--border-default);
+  left:             0;
+  width:            100vw;
+  height:           var(--footer-height);
+  background-color: var(--bg-footer);
+  color:            var(--text-footer);
+  z-index:          var(--z-footer);
+  opacity:          1;
 }
 
-.project-sheet[hidden] {
+.footer-inner {
+  display:                grid;
+  grid-template-columns:  1fr auto 1fr;
+  align-items:            center;
+  width:                  100%;
+  height:                 100%;
+  padding:                0 20px;
+}
+
+.footer-contacts {
+  display:      flex;
+  justify-self: end;
+  gap:          16px;
+}
+
+.footer-link {
+  font-family:     var(--font-serif);
+  font-size:       var(--text-mono-size);
+  line-height:     var(--text-mono-lh);
+  color:           var(--link-footer);
+  will-change:     opacity;
+  transition:      var(--transition-opacity);
+  letter-spacing:  0.07em;
+  font-weight:     200;
+  padding-bottom:  4px;
+}
+
+.footer-link:hover {
+  opacity: 0.7;
+}
+
+.footer-timer {
+  display: flex;
+  color: var(--text-footer);
+  justify-self: start;
+}
+
+
+/* Общий стиль Winamp-кнопки */
+
+
+.footer-player {
+  color:          var(--text-footer);
+  justify-self:   center;
+}
+
+.winamp-btn {
+  all: unset;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 26px;
+  padding-bottom: 1px;
+  /* Цвета кнопок */
+  background-color: var(--bg-button-default); /* Темно-синий фон кнопки */
+  border: 1px solid var(--border-blue-light); /* Светлая грань (верх/лево) */
+  border-right-color: var(--border-blue-dark); /* Темная грань (низ/право) */
+  border-bottom-color: var(--border-blue-dark);
+  cursor: pointer;
+  box-sizing: content-box;
+  transition: transform 0.1s, border 0.1s;
+}
+
+.winamp-btn::after {
+  content: '';
+  position: absolute;
+  top: -9px;
+  bottom: -9px;
+  left: -4px;
+  right: -4px;
+  z-index: 0;
+}
+
+/* Эффект наведения */
+.winamp-btn:hover {
+  opacity: 0.8;
+}
+
+/* Эффект "вдавливания" при клике (как в Winamp) */
+.winamp-btn:active {
+  border: 1px solid var(--border-blue-dark); /* Меняем грани наоборот */
+  border-right-color: var(--border-blue-light);
+  border-bottom-color: var(--border-blue-light);
+  transform: translate(1px, 1px);
+}
+
+/* Иконка внутри кнопки */
+.winamp-icon {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* Иконка Паузы скрыта по умолчанию */
+.winamp-play .icon-pause {
+  display: none;
+}
+/* Иконка Плея видна по умолчанию */
+.winamp-play .icon-play {
+  display: block;
+}
+
+/* Когда нажат Плей, добавляем класс playing */
+.winamp-play.playing .icon-play {
+  display: none;
+}
+.winamp-play.playing .icon-pause {
+  display: block;
+}
+
+/* ===================== ГРОМКОСТЬ (выезжающий слайдер) ===================== */
+.volume-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.volume-slider-container {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 3px 14px 12px;
+  min-width: 110px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+  z-index: 10;
+  background-color: var(--bg-button-default); /* Темно-синий фон кнопки */
+  border: 1px solid var(--border-blue-light); /* Светлая грань (верх/лево) */
+  border-right-color: var(--border-blue-dark); /* Темная грань (низ/право) */
+  border-bottom-color: var(--border-blue-dark);
+  display: none; /* Скрыт по умолчанию */
+}
+
+/* Только HOVER. Убираем focus-within, чтобы не фиксировался кликом */
+.volume-wrapper:hover .volume-slider-container,
+.volume-slider-container:hover {
+  display: block;
+}
+
+/* Трек ползунка (линия) */
+.volume-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 3px; /* Тонкая пиксельная линия */
+  background: #4f4f8d; /* Синий трек */
+  border-top: 1px solid #1e105c; 
+  border-left: 1px solid #110350; 
+  outline: none;
+}
+
+/* Стилизация заполненной части (слева от бегунка) для Chrome/Edge/Safari */
+.volume-slider::-webkit-slider-runnable-track {
+  height: 3px;
+  background: #4a4a9a;
+  border: none;
+}
+
+/* Бегунок (ползунок) - стилизован как кнопка Winamp */
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px; 
+  height: 13px;
+  margin-top: -5px; /* Центрируем бегунок на треке */
+  background-color: #9a9ace; 
+  border: 1px solid #EBEBF6; 
+  border-right-color: var(--border-blue-dark);
+  border-bottom-color: var(--border-blue-dark);
+  cursor: pointer;
+}
+
+/* Эффект "вдавленности" при перетаскивании бегунка */
+.volume-slider:active::-webkit-slider-thumb {
+  border: 1px solid #0C0431;
+  border-right-color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
+/* Отключение и включение звука */
+.icon-mute { 
+  display: none;
+} 
+
+.icon-volume {
+  display: block;
+}
+
+
+/* ===================== Плейлист с треками ===================== */
+
+
+.playlist-wrapper { 
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.playlist-container {
+  position: absolute;
+  bottom: 32px; /* Отступ снизу, чтобы висеть над кнопками */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--bg-button-default);
+  border: 1px solid var(--border-blue-light);
+  border-right-color: var(--border-blue-dark); /* Темная грань (низ/право) */
+  border-bottom-color: var(--border-blue-dark);
+  padding: 2px 0 0;
+  min-width: 200px;
+  display: none; /* Скрыт по умолчанию */
+  z-index: 20;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
+  flex-direction: column;
+  letter-spacing: 0.117em;
+}
+
+.playlist-header {
+  color: var(--text-footer);
+  font-size: var(--text-mono-size-xs);
+  text-transform: uppercase;
+  padding: 7px 16px 8px;
+  font-weight: 300;
+  text-align: left;
+  opacity: 0.95;
+}
+
+.playlist-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.playlist-items li {
+  font-size: var(--text-mono-size-xxs);
+  line-height: var(--text-mono-lh-xs);
+  text-transform: uppercase;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  gap: 8px;
+  color: var(--text-footer);
+  cursor: pointer;
+  transition: background 0.2s;
+  border-top: 1px solid var(--border-inverse);
+}
+
+.playlist-items li:hover {
+  background-color: var(--bg-button-hover);
+}
+
+.playlist-items li:active {
+  background-color: var(--bg-button-active);
+}
+
+.pl-num {
+  opacity: 0.45;
+  min-width: 20px;
+}
+
+.pl-name {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.8;
+  font-weight: 300;
+}
+
+.pl-time {
+  opacity: 0.45;
+  margin-left: 28px;
+}
+
+.playlist-items li, .pl-name, .pl-time {
+  -webkit-font-smoothing: antialiased; /* Для Chrome/Safari */
+  -moz-osx-font-smoothing: grayscale;  /* Для Firefox на Mac */
+  text-rendering: optimizeLegibility;  /* Общее улучшение читаемости */
+  font-family: 'IBM Plex Mono', monospace; /* Явно укажите шрифт */
+}
+
+/* Показ списка */
+.playlist-wrapper.show .playlist-container,
+.playlist-wrapper:hover .playlist-container {
+  display: flex;
+}
+
+
+/* ─── Микро-подсказка ошибки ─────────────────────────── */
+.player-error {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-default);
+  color: var(--text-default);
+  padding: 4px 12px;
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  font-size: var(--text-mono-size-xs);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.player-error.is-visible {
+  opacity: 1;
+}
+
+/* ─── Лоадер (мигающая точка) ─────────────────────────── */
+.winamp-play .loader-dot {
   display: none;
 }
 
-.project-sheet.is-open {
-  transform: translateY(0);
+.winamp-play.loading .loader-dot {
+  display: block;
 }
 
-.project-sheet__bar {
-  position:         sticky;
-  top:              0;
-  display:          flex;
-  align-items:      center;
-  justify-content:  center;
-  height:           48px;
-  border-bottom:    1px solid var(--border-default);
-  background-color: var(--bg-default);
+.winamp-play.loading .icon-play,
+.winamp-play.loading .icon-pause {
+  display: none;
 }
 
-.project-sheet__close {
-  display:     flex;
-  align-items: center;
-  padding:     12px 24px;
-  cursor:      pointer;
-  will-change: opacity;
-  transition:  var(--transition-opacity);
+.loader-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--text-footer);
+  animation: pulse-dot 0.8s ease-in-out infinite alternate;
 }
 
-.project-sheet__close:hover {
-  opacity: 0.5;
+@keyframes pulse-dot {
+  0% { opacity: 0.2; transform: scale(0.8); }
+  100% { opacity: 1; transform: scale(1.2); }
 }
 
-.project-sheet__content {
-  padding: 40px;
+
+.playlist-items li.active .pl-num {
+  color: #fff;
+  animation: pulse-text 1.2s ease-in-out infinite;
 }
+@keyframes pulse-text {
+  0% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+  100% { opacity: 0.4; transform: scale(0.9); }
+}
+
+
 
 
 /* ─── 7. Адаптив: Mobile / Tablet (max-width: 1080px) ───────────────────────── */
 @media (max-width: 1080px) {
 
   :root {
-    --text-title-size:  18px;
-    --text-title-lh:    1.3;
-    --text-p-size:      17px;
-    --text-p-lh:        1.4;
-    --text-mono-size:   12px;
-    --text-mono-lh:     1.2;
+    --text-title-size:  1rem;
+    --text-title-lh:    1.5;
+    --text-p-size:      1.1rem;
+    --text-p-lh:        1.8;
+    --text-mono-size:   0.9rem;
+    --text-mono-lh:     1.3;
     --header-height:    64px;
-    --footer-height:    79px;
+  }
+
+  img {
+    image-rendering: auto;
   }
 
   .header-nav {
-    padding: 0 20px;
+    padding: 0;
   }
 
   .header-zone-btn {
@@ -400,28 +665,108 @@ button {
     height: 30px;
   }
 
+
+  /* ── Шапка ── */
   .site-header {
-    width: 100vw;
-    left:  0;
+    width:     100vw;
+    left:      0;
     transform: none;
   }
 
+  body.active-projects .site-header,
+  body.active-projects .header-zone-btn,
+  body.active-projects .header-logo {
+    background-color: var(--bg-default) !important;
+  }
+
+  .header-zone-btn {
+    cursor:          pointer;
+    pointer-events:  auto;
+    min-width:       65px;
+    min-height:      48px;
+    padding:         16px 16px 0;
+  }
+
+  .header-zone-btn--craft .header-zone-icon {
+    width:  68px;
+    height: 36px;
+  }
+
+  .header-zone-btn--poetry .header-zone-icon {
+    width:  84px;
+    height: 36px;
+  }
+
+
+    /* ── Overlay ── */
+  .site-overlay.is-visible {
+    opacity:        1;
+    pointer-events: auto;
+  }
+
   .footer-inner {
+    display:        flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 16px;
+  }
+
+  .volume-wrapper {
+    display: none !important;
+  }
+
+
+}
+
+
+@media (max-width: 712px) {
+
+  :root {
+    --footer-height:    112px;
+  }
+
+
+  /* ── Футер ── */
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items:    center;
+    gap:            4px 20px;
+    padding:        0px 16px;
+    height:         auto;
+    min-height:     var(--footer-height);
+  }
+  
+  .footer-link {
+    font-size: 0.99rem;
+    margin-bottom: 0;
+  }
+
+  .footer-contacts {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .playlist-container {
+    left: auto;
+    right: 0;
+    transform: translateX(0);
+  }
+
+}
+
+
+@media (max-width: 336px) {
+
+  .footer-inner {
+    display: flex;
     flex-direction: column;
     justify-content: center;
-    gap:     12px;
-    padding: 12px 20px;
-    height:  auto;
-    min-height: var(--footer-height);
+    align-items:    center;
+    gap:            10px 20px;
   }
 
-  .project-sheet {
-    left:   0;
-    width:  100vw;
-    height: 90vh;
-  }
-
-  .project-sheet__content {
-    padding: 24px 20px;
-  }
 }

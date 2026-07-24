@@ -13,8 +13,15 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,200;7..72,300;7..72,400&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet" />
-  
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,200;7..72,300;7..72,400&family=IBM+Plex+Mono:wght@200;300;400&display=swap" rel="stylesheet" />
+
+  <!-- Preload фоновых изображений -->
+  <link rel="preload" as="image" href="images/bg/bg-morning-birds-astaninaa.webp" />
+  <link rel="preload" as="image" href="images/bg/bg-birds-and-street-cleaner-astaninaa.webp" />
+  <link rel="preload" as="image" href="images/bg/bg-soloway-astaninaa.webp" />
+  <link rel="preload" as="image" href="images/bg/bg-night-birds-astaninaa.webp" />
+  <link rel="preload" as="image" href="images/bg/bg-raining-astaninaa.webp" />
+
   <link rel="stylesheet" href="css/global.css" />
   <link rel="stylesheet" href="css/main-page.css" />
   <link rel="icon" type="image/png" href="images/favicon/favicon-96x96.png" sizes="96x96" />
@@ -27,6 +34,9 @@
 </head>
 
 <body>
+  <!-- ===== ФОНОВЫЕ СЛОИ ===== -->
+  <div class="bg-layer-1"></div>
+  <div class="bg-layer-2"></div>
 
   <!-- ===================== ШАПКА ===================== -->
   <header class="site-header" role="banner">
@@ -40,11 +50,13 @@
           loading="eager" fetchpriority="high"
         />
       </button>
+      <span class="header-divider" aria-hidden="true"></span>
       <a class="header-logo" href="/" aria-label="На главную страницу">
         <!-- ЗДЕСЬ ВСТАВИТЬ SVG-ЛОГОТИП (инлайн или через img) -->
         <img src="images/astaninaaa-logo.webp" alt="Ясна Астанина" loading="eager" fetchpriority="high" />
         <!-- <svg>...</svg> -->
       </a>
+      <span class="header-divider" aria-hidden="true"></span>
       <button class="header-zone-btn header-zone-btn--poetry" aria-controls="zone-poetry" aria-expanded="false" aria-label="Открыть раздел Поэзия">
         <img
           class="header-zone-icon"
@@ -162,10 +174,181 @@
   <footer class="site-footer" role="contentinfo">
     <div class="footer-inner">
       <time class="footer-timer mono" id="footer-timer" aria-live="polite">--:-- +7 GMT</time>
-      <span class="footer-player mono" aria-label="Звук включен"></span>
+
+      <!-- ПЛЕЕР -->
+      <span class="footer-player mono" role="group" aria-label="Аудио плеер">
+
+        <!-- Кнопка: Предыдущий трек -->
+        <button class="winamp-btn winamp-prev" aria-label="Предыдущий трек">
+
+          <svg class="winamp-icon" width="18" height="16" viewBox="0 0 18 16" shape-rendering="crispEdges" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 0H0V15L1 15V1L4 1V0Z" fill="#0C0431"/>
+            <path d="M3 1H1V15H3V1Z" fill="#8E8EC3"/>
+            <path d="M2.5 15.4287V15.5H0.5V15.4287H2.5Z" fill="#8E8EC3" stroke="#EBEBF6"/>
+            <path d="M17 1H16H14.5V3H12.5V5H10V7H7.5V9H10V11H12.5V13H14.5V15H16H17V1Z" fill="#8E8EC3"/>
+            <mask id="path-5-inside-1_614_20003" fill="white">
+            <path d="M17 1H16V14V15H17V1Z"/>
+            </mask>
+            <path d="M17 1H16V14V15H17V1Z" fill="#8E8EC3"/>
+            <path d="M16 1V0H15V1H16ZM17 1H18V0H17V1ZM17 15V16H18V15H17ZM16 15H15V16H16V15ZM16 1V2H17V1V0H16V1ZM17 1H16V15H17H18V1H17ZM17 15V14H16V15V16H17V15ZM16 15H17V14H16H15V15H16ZM16 14H17V1H16H15V14H16Z" fill="#EBEBF6" mask="url(#path-5-inside-1_614_20003)"/>
+            <path d="M17 1H14.5V3H12.5V5H10V7H7.5V8" stroke="#0C0431"/>
+            <path d="M17 15H14.5V13H12.5V11H10V9H7.5V8" stroke="#EBEBF6"/>
+          </svg>
+
+
+
+
+
+
+
+
+        </button>
+
+        <!-- ОДНА КНОПКА: Воспроизведение / Пауза (переключение) -->
+        <button class="winamp-btn winamp-play" id="play-pause-btn" aria-label="Воспроизвести">
+          <!-- Иконка Play -->
+          <svg class="winamp-icon icon-play" width="18" height="16" viewBox="0 0 18 16" shape-rendering="crispEdges" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g clip-path="url(#clip0_614_20021)">
+            <path d="M2 1V13.5641V15H4.69904V13.5641H7.06128V12.1282H10.0984V10.3333H12.4607V8.89744H15.8353V7.46154H12.4607V6.02564H10.0984V4.58974H7.39874V2.4359H4.69904V1H2Z" fill="#8E8EC3"/>
+            <path d="M2.33008 14.5V1.5H4.47061V2.83333H7.43532V4.5H10.0706V5.83333H12.8706V7.16667H16V9.7" stroke="#0C0431"/>
+            <path d="M2 14.6663H4.47059V13.3329H7.43529V11.9996H10.4V10.4998H12.8706V9.1665H16V8.5" stroke="#EBEBF6"/>
+            </g>
+            <defs>
+            <clipPath id="clip0_614_20021">
+            <rect width="18" height="16" fill="white"/>
+            </clipPath>
+            </defs>
+          </svg>
+
+
+
+          <!-- Иконка Pause (скрыта через CSS, а не HTML) -->
+          <svg class="winamp-icon icon-pause" viewBox="0 0 18 16" shape-rendering="crispEdges" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M7 0H2V16H3V1L7 1V0Z" fill="#0C0431"/>
+            <path d="M6 1H3V15H6V1Z" fill="#8E8EC3"/>
+            <path d="M6.5 1.5V15.5H6.11328V1.5H6.5ZM5.11328 15.4287V15.5H3.5V15.4287H5.11328Z" fill="#8E8EC3" stroke="#EBEBF6"/>
+            <path d="M16 0H11V16H12V1L16 1V0Z" fill="#0C0431"/>
+            <path d="M15 1H12V15H15V1Z" fill="#8E8EC3"/>
+            <path d="M15.5 1.5V15.5H15.1133V1.5H15.5ZM14.1133 15.4287V15.5H12.5V15.4287H14.1133Z" fill="#8E8EC3" stroke="#EBEBF6"/>
+          </svg>
+
+
+
+        </button>
+
+        <!-- Кнопка: Следующий трек -->
+        <button class="winamp-btn winamp-next" aria-label="Следующий трек">
+          <svg class="winamp-icon" width="18" height="16" viewBox="0 0 18 16" shape-rendering="crispEdges" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 0H14V15L15 15V1L18 1V0Z" fill="#0C0431"/>
+            <path d="M17 1H15V15H17V1Z" fill="#8E8EC3"/>
+            <path d="M16.5 15.4287V15.5H14.5V15.4287H16.5Z" fill="#8E8EC3" stroke="#EBEBF6"/>
+            <path d="M1 1H2H3.5V3H5.5V5H8V7H10.5V9H8V11H5.5V13H3.5V15H2H1V1Z" fill="#8E8EC3"/>
+            <mask id="path-5-inside-1_614_20031" fill="white">
+            <path d="M1 1H2V14V15H1V1Z"/>
+            </mask>
+            <path d="M2 1V0H3V1H2ZM1 1H0V0H1V1ZM1 15V16H0V15H1ZM2 15H3V16H2V15ZM2 1V2H1V1V0H2V1ZM1 1H2V15H1H0V1H1ZM1 15V14H2V15V16H1V15ZM2 15H1V14H2H3V15H2ZM2 14H1V1H2H3V14H2Z" fill="#0C0431" mask="url(#path-5-inside-1_614_20031)"/>
+            <path d="M1 1H3.5V3H5.5V5H8V7H10.5V8" stroke="#0C0431"/>
+            <path d="M1 15H3.5V13H5.5V11H8V9H10.5V8" stroke="#EBEBF6"/>
+          </svg>
+
+
+
+        </button>
+
+        <!-- Кнопка: Громкость -->
+        <div class="volume-wrapper">
+          <button class="winamp-btn winamp-volume" id="volume-btn" aria-label="Громкость">
+            <!-- Иконка включенного звука -->
+            <svg class="winamp-icon icon-volume" width="18" height="16" viewBox="0 0 18 16" shape-rendering="crispEdges">
+              <path d="M2 5.33333H6.28571V4H8V2.5H10.5V1L12.5 1V15H10.5V13.5H8V12H6.28571V10.6667H2V5.33333Z" fill="#8E8EC3"/>
+              <path d="M2 5.5H6.4998V4H8.5V2.5H10.4998V1H13.2002" stroke="#0C0431"/>
+              <path d="M2 10.5H6.5V12H8.5V13.5H10.5V15H12" stroke="#EBEBF6"/>
+              <mask id="path-4-inside-1_618_2061" fill="white">
+              <path d="M1 5H2V10.5714V11H1V5Z"/>
+              </mask>
+              <path d="M2 5V4H3V5H2ZM1 5H0V4H1V5ZM1 11V12H0V11H1ZM2 11H3V12H2V11ZM2 5V6H1V5V4H2V5ZM1 5H2V11H1H0V5H1ZM1 11V10H2V11V12H1V11ZM2 11H1V10.5714H2H3V11H2ZM2 10.5714H1V5H2H3V10.5714H2Z" fill="#0C0431" mask="url(#path-4-inside-1_618_2061)"/>
+              <path d="M12.0002 1.5H13.2002V14.5V15.5H12.0002V1.5Z" fill="#EBEBF6"/>
+            </svg>
+
+
+
+            <!-- Иконка выключенного звука -->
+            <svg class="winamp-icon icon-mute" width="18" height="16" viewBox="0 0 18 16" shape-rendering="crispEdges" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1 5.33333H5.28571V4H7V2.5H9.5V1L11.5 1V15H9.5V13.5H7V12H5.28571V10.6667H1V5.33333Z" fill="#8E8EC3"/>
+              <path d="M1.0002 5.5H5.5V4H7.5002V2.5H9.5V1H12" stroke="#0C0431"/>
+              <path d="M1 10.5H5.5V12H7.5V13.5H9.5V15H11" stroke="#EBEBF6"/>
+              <mask id="path-4-inside-1_618_2089" fill="white">
+              <path d="M1 5H2V10.5714V11H1V5Z"/>
+              </mask>
+              <path d="M2 5V4H3V5H2ZM1 5H0V4H1V5ZM1 11V12H0V11H1ZM2 11H3V12H2V11ZM2 5V6H1V5V4H2V5ZM1 5H2V11H1H0V5H1ZM1 11V10H2V11V12H1V11ZM2 11H1V10.5714H2H3V11H2ZM2 10.5714H1V5H2H3V10.5714H2Z" fill="#0C0431" mask="url(#path-4-inside-1_618_2089)"/>
+              <path d="M10.8 1.5H12V14.5V15.5H10.8V1.5Z" fill="#EBEBF6"/>
+              <path d="M10.4193 4.48325L9 5.90259L14.9453 11.8479L15.4907 11.3024L10.4737 6.28534L11.3475 5.41146L10.4193 4.48325Z" fill="#0C0431"/>
+              <path d="M11.3484 5.41117L10.4258 6.33374L15.0668 10.9748L15.9894 10.0522L11.3484 5.41117Z" fill="#8E8EC3"/>
+              <path d="M15.9886 10.7595L16.2102 10.9811L15.4983 11.6931L15.2766 11.4714L15.9886 10.7595Z" fill="#8E8EC3" stroke="#EBEBF6"/>
+              <path d="M9.48105 10.9789L10.9004 12.3982L16.8457 6.45291L16.3002 5.90745L11.2831 10.9245L10.4093 10.0506L9.48105 10.9789Z" fill="#0C0431"/>
+              <path d="M10.4095 10.0501L11.332 10.9727L15.9731 6.33162L15.0505 5.40905L10.4095 10.0501Z" fill="#8E8EC3"/>
+              <path d="M15.758 5.40936L15.9797 5.1877L16.6916 5.89964L16.4699 6.1213L15.758 5.40936Z" fill="#8E8EC3" stroke="#EBEBF6"/>
+            </svg>
+
+
+
+
+
+
+
+          </button>
+          <div class="volume-slider-container">
+            <input type="range" class="volume-slider" id="volume-slider" min="0" max="100" value="50" aria-label="Регулировка громкости">
+          </div>
+        </div>
+
+        <!-- Обертка для списка -->
+        <div class="playlist-wrapper" id="playlist-wrapper">
+          <button class="winamp-btn winamp-playlist" id="playlist-btn" aria-label="Открыть список треков">
+            <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 4.99994L2 2L16 2L16 2.99995L3.4 2.99998L3.4 4.99994L2 4.99994Z" fill="#0C0431"/>
+              <path d="M16 5L16 3L3 3L3 5L16 5Z" fill="#8E8EC3"/>
+              <path d="M2 9.49994L2 6.5L16 6.5L16 7.49995L3.4 7.49998L3.4 9.49994L2 9.49994Z" fill="#0C0431"/>
+              <path d="M16 9.5L16 7.5L3 7.5L3 9.5L16 9.5Z" fill="#8E8EC3"/>
+              <path d="M2 13.9999L2 11L16 11L16 11.9999L3.4 12L3.4 13.9999L2 13.9999Z" fill="#0C0431"/>
+              <path d="M16 14L16 12L3 12L3 14L16 14Z" fill="#8E8EC3"/>
+            </svg>
+
+
+
+
+
+
+          </button>
+          
+          <!-- Сама плашка с треками -->
+          <div class="playlist-container" id="playlist-container">
+            <div class="playlist-header">Плейлист</div>
+            <ul class="playlist-items">
+              <!-- Список будет заполнен JS
+              <li><span class="pl-num">01</span><span class="pl-name">Утренние трели </span><span class="pl-time">2:14</span></li>
+              <li><span class="pl-num">02</span><span class="pl-name">Соловей в полдень</span><span class="pl-time">4:22</span></li>
+              <li><span class="pl-num">03</span><span class="pl-name">Ночные птицы</span><span class="pl-time">3:48</span></li>
+              <li><span class="pl-num">04</span><span class="pl-name">Шум дождя</span><span class="pl-time">5:01</span></li>
+              <li><span class="pl-num">05</span><span class="pl-name">Птицы и дворник</span><span class="pl-time">3:15</span></li>
+              -->
+            </ul>
+          </div>
+        </div>
+
+        <!-- Микро-подсказка ошибки -->
+        <div id="player-error" class="player-error mono" aria-live="polite" hidden></div>
+
+        <!-- Скрытый аудиоэлемент -->
+        <audio id="player-audio" preload="metadata"></audio>
+
+      </span>
+
       <nav class="footer-contacts" aria-label="Контакты">
         <a class="footer-link" href="mailto:astanina.aa@yandex.ru" aria-label="Написать на email">email</a>
         <a class="footer-link" href="https://t.me/astaninaaa" target="_blank" rel="noopener noreferrer" aria-label="Написать в Telegram">telegram</a>
+        <a class="footer-link" href="https://www.behance.net/astanina" target="_blank" rel="noopener noreferrer" aria-label="Behance">behance</a>
+        <a class="footer-link" href="https://dribbble.com/astaninaaa" target="_blank" rel="noopener noreferrer" aria-label="Dribbble">dribbble</a>
       </nav>
     </div>
   </footer>

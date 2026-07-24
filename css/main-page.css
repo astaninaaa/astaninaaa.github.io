@@ -3,6 +3,32 @@
    ============================================================================= */
 
 
+/* ─── Фоновые слои (только на главной) ─────────────────── */
+.bg-layer-1,
+.bg-layer-2 {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+  pointer-events: none;
+}
+
+.bg-layer-1 {
+  opacity: 1;
+}
+
+/* Если не главная страница — скрываем слои */
+body:not(.is-home) .bg-layer-1,
+body:not(.is-home) .bg-layer-2 {
+  display: none;
+}
+
+
+
 /* ─── 1. Основной layout (Desktop-First) ────────────────────────────────────── */
 
 .site-main {
@@ -407,32 +433,32 @@
 body.zone-hovered--craft .zone--craft {
   opacity:          1 !important;
   z-index:          var(--z-active);
-  background-image: linear-gradient(to left,
+  /*background-image: linear-gradient(to left,
     rgba(255, 255, 255, 0) 0,
     rgba(255, 255, 255, 0.8) 8%,
     rgba(255, 255, 255, 1) 28%,
     rgba(255, 255, 255, 1) 100%
-  );
+  );*/
 }
 
 body.zone-hovered--craft .projects-cards-container {
-  opacity:        0.10 !important;
+  opacity:        0.07 !important;
   pointer-events: none;
 }
 
 body.zone-hovered--poetry .zone--poetry {
   opacity:          1 !important;
   z-index:          var(--z-active);
-  background-image: linear-gradient(to right,
+  /*background-image: linear-gradient(to right,
     rgba(255, 255, 255, 0) 0,
     rgba(255, 255, 255, 0.8) 8%,
     rgba(255, 255, 255, 1) 24%,
     rgba(255, 255, 255, 1) 100%
-  );
+  );*/
 }
 
 body.zone-hovered--poetry .projects-cards-container {
-  opacity:        0.10 !important;
+  opacity:        0.05 !important;
   pointer-events: none;
 }
 
@@ -524,21 +550,21 @@ body.active-projects .header-logo {
 }
 
 body.active-craft .zone--craft {
-  background-image: linear-gradient(to left,
+  /*background-image: linear-gradient(to left,
     rgba(255, 255, 255, 0) 0,
     rgba(255, 255, 255, 0.8) 8%,
     rgba(255, 255, 255, 1) 28%,
     rgba(255, 255, 255, 1) 100%
-  );
+  );*/
 }
 
 body.active-poetry .zone--poetry {
-  background-image: linear-gradient(to right,
+  /*background-image: linear-gradient(to right,
     rgba(255, 255, 255, 0) 0,
     rgba(255, 255, 255, 0.8) 8%,
     rgba(255, 255, 255, 1) 24%,
     rgba(255, 255, 255, 1) 100%
-  );
+  );*/
 }
 
 body.active-craft .projects-cards-container,
@@ -558,23 +584,6 @@ body.active-poetry .card__counter {
    МОБИЛЬНЫЙ АДАПТИВ — единый блок для всех экранов ≤ 1080px
    ═══════════════════════════════════════════════════════════════════════════════ */
 @media (max-width: 1080px) {
-
-  /* ── Глобальные переопределения ── */
-  :root {
-    --text-title-size:  1rem;
-    --text-title-lh:    1.5;
-    --text-p-size:      1.1rem;
-    --text-p-lh:        1.8;
-    --text-mono-size:   0.9rem;
-    --text-mono-lh:     1.3;
-    --header-height:    64px;
-    --footer-height:    79px;
-    /* ── --projects-height:  264px; ── */
-  }
-
-  img {
-    image-rendering: auto;
-  }
 
   /* ── Сброс десктопных ховер-классов ── */
   body.zone-hovered--craft .zone--craft,
@@ -601,44 +610,13 @@ body.active-poetry .card__counter {
     pointer-events: auto !important;
   }
 
-  /* ── Шапка ── */
-  .site-header {
-    width:     100vw;
-    left:      0;
-    transform: none;
-  }
-
-  body.active-projects .site-header,
-  body.active-projects .header-zone-btn,
-  body.active-projects .header-logo {
-    background-color: var(--bg-default) !important;
-  }
-
-  .header-zone-btn {
-    cursor:          pointer;
-    pointer-events:  auto;
-    min-width:       65px;
-    min-height:      48px;
-    padding:         16px 16px 0;
-  }
-
-  .header-zone-btn--craft .header-zone-icon {
-    width:  68px;
-    height: 36px;
-  }
-
-  .header-zone-btn--poetry .header-zone-icon {
-    width:  84px;
-    height: 36px;
-  }
-
   /* ── Центральный блок ── */
   .site-center {
     position: fixed;
     top: var(--header-height);
     left: 0;
     width: 100%;
-    height: calc(100vh - var(--header-height) - var(--footer-height) - (88vw * 0.535 + 118px));
+    height: calc(100vh - var(--header-height) - var(--footer-height) - (88vw * 0.535 + 120px));
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -652,11 +630,12 @@ body.active-poetry .card__counter {
   .hero-signature {
     max-width:  96%;
     max-height: auto;
+    mix-blend-mode: multiply;
   }
 
   /* ── Основной layout ── */
   .site-main {
-    display: block;        /* или просто убрать display: flex */
+    display: block;
     height: auto;
     min-height: auto;
     overflow: visible;
@@ -670,7 +649,7 @@ body.active-poetry .card__counter {
     bottom: var(--footer-height);
     left: 0;
     width: 100%;
-    height: calc(88vw * 0.535 + 118px);        
+    height: calc(88vw * 0.535 + 120px);        
     opacity:    1;
     transform:  none;
     z-index:    10;
@@ -763,6 +742,58 @@ body.active-poetry .card__counter {
     text-overflow: ellipsis;
 
   }
+
+  /* ─── 6. Панель проекта (Project Sheet) ─────────────────────────────────────── */
+.project-sheet {
+  position:         fixed;
+  bottom:           0;
+  left:             var(--zone-craft-width);
+  width:            calc(100vw - var(--zone-craft-width) - var(--zone-poetry-width));
+  height:           calc(100vh - var(--header-height));
+  background-color: var(--bg-default);
+  z-index:          var(--z-sheet);
+  transform:        translateY(100%);
+  will-change:      transform;
+  transition:       transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow-y:       auto;
+  border-top:       1px solid var(--border-default);
+}
+
+.project-sheet[hidden] {
+  display: none;
+}
+
+.project-sheet.is-open {
+  transform: translateY(0);
+}
+
+.project-sheet__bar {
+  position:         sticky;
+  top:              0;
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  height:           48px;
+  border-bottom:    1px solid var(--border-default);
+  background-color: var(--bg-default);
+}
+
+.project-sheet__close {
+  display:     flex;
+  align-items: center;
+  padding:     12px 24px;
+  cursor:      pointer;
+  will-change: opacity;
+  transition:  var(--transition-opacity);
+}
+
+.project-sheet__close:hover {
+  opacity: 0.5;
+}
+
+.project-sheet__content {
+  padding: 40px;
+}
 
   /* ── Офф-канвас панели (Крафт и Поэзия) ── */
   .zone--craft {
@@ -1046,54 +1077,14 @@ body.active-poetry .card__counter {
     padding: 24px 20px 40px;
   }
 
-  /* ── Overlay ── */
-  .site-overlay.is-visible {
-    opacity:        1;
-    pointer-events: auto;
-  }
 
-  /* ── Футер ── */
-  .footer-inner {
-    display:        grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows:    auto auto;
-    align-items:    center;
-    gap:            4px 0;
-    padding:        10px 20px;
-    height:         auto;
-    min-height:     var(--footer-height);
-  }
-
-  .footer-timer {
-    grid-column: 1;
-    grid-row:    1;
-    font-size:   12px;
-  }
-
-  .footer-player {
-    grid-column: 2;
-    grid-row:    1;
-    text-align:  right;
-    font-size:   12px;
-  }
-
-  .footer-contacts {
-    grid-column: 1 / span 2;
-    grid-row:    2;
-    justify-content: space-between;
-    gap:         0;
-  }
-
-  .footer-link {
-    font-size: 12px;
-  }
 
 } /* конец медиа-запроса */
 
 
 
 /* ── Планшеты (только уменьшение карточек и подписи) ── */
-@media (min-width: 600px) and (max-width: 1080px) {
+@media (min-width: 450px) and (max-width: 1080px) {
   .hero-signature {
     max-width:  400px;
   }
