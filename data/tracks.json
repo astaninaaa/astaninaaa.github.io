@@ -3,22 +3,29 @@
     "id": "morning-birds",
     "name": "Утренние трели",
     "audio": "audio/morning-birds.mp3",
-    "bg": "images/bg/bg-morning-birds-astaninaa.webp",
+    "bg": "images/bg/bg-morning-birds-2-astaninaa.webp",
     "duration": 98
   },
   {
     "id": "soloway",
     "name": "Соловей в полдень",
     "audio": "audio/soloway.mp3",
-    "bg": "images/bg/bg-soloway-astaninaa.webp",
+    "bg": "images/bg/bg-soloway-2-astaninaa.webp",
     "duration": 45
   },
   {
-    "id": "night-birds",
+    "id": "evening-birds",
     "name": "Ночные птицы",
     "audio": "audio/night-birds.mp3",
-    "bg": "images/bg/bg-night-birds-astaninaa.webp",
+    "bg": "images/bg/bg-evening-birds-astaninaa.webp",
     "duration": 65
+  },
+  {
+    "id": "birds-and-street-cleaner",
+    "name": "Птицы и дворник",
+    "audio": "audio/birds-and-street-cleaner.mp3",
+    "bg": "images/bg/bg-birds-and-street-cleaner-2-astaninaa.webp",
+    "duration": 74
   },
   {
     "id": "raining",
@@ -26,12 +33,5 @@
     "audio": "audio/raining.mp3",
     "bg": "images/bg/bg-raining-astaninaa.webp",
     "duration": 60
-  },
-  {
-    "id": "birds-and-street-cleaner",
-    "name": "Птицы и дворник",
-    "audio": "audio/birds-and-street-cleaner.mp3",
-    "bg": "images/bg/bg-birds-and-street-cleaner-astaninaa.webp",
-    "duration": 74
   }
 ]
