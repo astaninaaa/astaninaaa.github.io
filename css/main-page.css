@@ -578,6 +578,58 @@ body.active-poetry .card__counter {
   opacity: 1;
 }
 
+  /* ─── 6. Панель проекта (Project Sheet) ─────────────────────────────────────── */
+.project-sheet {
+  position:         fixed;
+  bottom:           0;
+  left:             var(--zone-craft-width);
+  width:            calc(100vw - var(--zone-craft-width) - var(--zone-poetry-width));
+  height:           calc(100vh - var(--header-height));
+  background-color: var(--bg-default);
+  z-index:          var(--z-sheet);
+  transform:        translateY(100%);
+  will-change:      transform;
+  transition:       transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+  overflow-y:       auto;
+  border-top:       1px solid var(--border-default);
+}
+
+.project-sheet[hidden] {
+  display: none;
+}
+
+.project-sheet.is-open {
+  transform: translateY(0);
+}
+
+.project-sheet__bar {
+  position:         sticky;
+  top:              0;
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  height:           48px;
+  border-bottom:    1px solid var(--border-default);
+  background-color: var(--bg-default);
+}
+
+.project-sheet__close {
+  display:     flex;
+  align-items: center;
+  padding:     12px 24px;
+  cursor:      pointer;
+  will-change: opacity;
+  transition:  var(--transition-opacity);
+}
+
+.project-sheet__close:hover {
+  opacity: 0.5;
+}
+
+.project-sheet__content {
+  padding: 40px;
+}
+
 
 
 /* ═══════════════════════════════════════════════════════════════════════════════
@@ -742,58 +794,6 @@ body.active-poetry .card__counter {
     text-overflow: ellipsis;
 
   }
-
-  /* ─── 6. Панель проекта (Project Sheet) ─────────────────────────────────────── */
-.project-sheet {
-  position:         fixed;
-  bottom:           0;
-  left:             var(--zone-craft-width);
-  width:            calc(100vw - var(--zone-craft-width) - var(--zone-poetry-width));
-  height:           calc(100vh - var(--header-height));
-  background-color: var(--bg-default);
-  z-index:          var(--z-sheet);
-  transform:        translateY(100%);
-  will-change:      transform;
-  transition:       transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-  overflow-y:       auto;
-  border-top:       1px solid var(--border-default);
-}
-
-.project-sheet[hidden] {
-  display: none;
-}
-
-.project-sheet.is-open {
-  transform: translateY(0);
-}
-
-.project-sheet__bar {
-  position:         sticky;
-  top:              0;
-  display:          flex;
-  align-items:      center;
-  justify-content:  center;
-  height:           48px;
-  border-bottom:    1px solid var(--border-default);
-  background-color: var(--bg-default);
-}
-
-.project-sheet__close {
-  display:     flex;
-  align-items: center;
-  padding:     12px 24px;
-  cursor:      pointer;
-  will-change: opacity;
-  transition:  var(--transition-opacity);
-}
-
-.project-sheet__close:hover {
-  opacity: 0.5;
-}
-
-.project-sheet__content {
-  padding: 40px;
-}
 
   /* ── Офф-канвас панели (Крафт и Поэзия) ── */
   .zone--craft {

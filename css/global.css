@@ -9,15 +9,15 @@
   --bg-default:        #FFFFFF;
   --bg-muted:          #F3EFEF;
   --bg-image-cover:    #F3EFEF;
-  --bg-footer:         #110350;
+  --bg-footer:         #343a91;
   --link-default:      #041783;
   --link-hover:        #12015c;
-  --bg-button-default: #27226d;
-  --bg-button-hover:   rgba(255,255,255,0.1);
-  --bg-button-active:  rgba(255,255,255,0.05);
-  --border-blue-light: #3c3c7e;
-  --border-blue-dark:  #08082b;
-  --overlay:           rgba(26, 23, 40, 0.4);
+  --bg-button-default: #393ba1;
+  --bg-button-hover:   rgba(255, 255, 255, 0.07);
+  --bg-button-active:  rgba(255, 255, 255, 0.05);
+  --border-blue-light: #6262ad;
+  --border-blue-dark:  #191950;
+  --overlay:           rgba(23, 26, 40, 0.4);
   --border-default:    #ddddeb;
   --border-inverse:    rgba(255, 255, 255, 0.15);
   --text-default:      #14123B;
@@ -44,7 +44,7 @@
 
   /* Размеры статичных якорей */
   --header-height:     64px;
-  --footer-height:     44px;
+  --footer-height:     46px;
   --projects-height:   47vh;
 
   /* Ширины зон */
@@ -346,7 +346,7 @@ button {
 
 /* Эффект наведения */
 .winamp-btn:hover {
-  opacity: 0.8;
+  opacity: 0.75;
 }
 
 /* Эффект "вдавливания" при клике (как в Winamp) */
@@ -424,7 +424,7 @@ button {
 /* Стилизация заполненной части (слева от бегунка) для Chrome/Edge/Safari */
 .volume-slider::-webkit-slider-runnable-track {
   height: 3px;
-  background: #4a4a9a;
+  background: var(--border-blue-light);
   border: none;
 }
 
@@ -716,6 +716,7 @@ button {
 }
 
 
+
 @media (max-width: 712px) {
 
   :root {
@@ -736,7 +737,6 @@ button {
   }
   
   .footer-link {
-    font-size: 0.99rem;
     margin-bottom: 0;
   }
 

@@ -532,8 +532,8 @@ function initPoetryExpand() {
     document.body.classList.add('active-projects');
 
     // Показываем sheet (убираем hidden, даём браузеру отрисовать)
+    sheet.style.display = 'block'; // явно делаем видимым
     sheet.removeAttribute('hidden');
-    // Небольшая задержка чтобы display:none → display:block → transition сработал
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         sheet.classList.add('is-open');
@@ -565,10 +565,11 @@ function initPoetryExpand() {
           sheetContent.appendChild(document.importNode(node, true));
         });
       }
+      
     } catch (err) {
       console.warn('[main-page.js] Ошибка загрузки проекта:', err);
       const errMsg = document.createElement('p');
-      errMsg.textContent = 'Не удалось загрузить страницу проекта.';
+      errMsg.textContent = 'Скоро здесь появится кейс проекта';
       sheetContent.textContent = '';
       sheetContent.appendChild(errMsg);
     }
@@ -591,6 +592,7 @@ function initPoetryExpand() {
     // После окончания анимации — скрываем через hidden
     sheet.addEventListener('transitionend', () => {
       sheet.setAttribute('hidden', '');
+      sheet.style.display = ''; // сбрасываем инлайн-стиль
       sheetContent.textContent = '';
     }, { once: true });
 
