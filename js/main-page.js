@@ -615,11 +615,12 @@ function initPoetryExpand() {
     const href = card.getAttribute('href');
     if (!isValidLink(href)) return;
 
-    // Блокируем стандартный переход по ссылке
-    e.preventDefault();
+    // Пропускаем внешние ссылки (Figma)
+    if (href.startsWith('http')) return;
 
+    // Внутренние ссылки открываем через sheet, как раньше
+    e.preventDefault();
     openSheet(href);
-    // Записываем хэш
     history.replaceState(null, '', '#projects');
   });
 
@@ -1040,6 +1041,11 @@ async function renderProjects() {
 
     if (hasLink) {
       card.href = item.link;
+      // Внешние ссылки (Figma) — в новой вкладке
+      if (item.link.startsWith('http')) {
+        card.target = '_blank';
+        card.rel = 'noopener noreferrer';
+      }
       if (hasValue(item.title)) {
         card.setAttribute('aria-label', `Открыть кейс: ${item.title}`);
       }

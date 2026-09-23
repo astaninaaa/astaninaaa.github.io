@@ -582,8 +582,8 @@ body.active-poetry .card__counter {
 .project-sheet {
   position:         fixed;
   bottom:           0;
-  left:             var(--zone-craft-width);
-  width:            calc(100vw - var(--zone-craft-width) - var(--zone-poetry-width));
+  left:             20vw;
+  width:            calc(60vw);
   height:           calc(100vh - var(--header-height));
   background-color: var(--bg-default);
   z-index:          var(--z-sheet);

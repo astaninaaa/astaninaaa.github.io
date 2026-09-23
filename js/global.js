@@ -549,3 +549,38 @@
   loadTracksAndInit();
 
 })();
+
+/* ─── Список площадок в футере (dropdown) ──────────────────────────────────── */
+(function initLinksList() {
+  const wrapper = document.getElementById('linkslist-wrapper');
+  const btn     = document.getElementById('linkslist-btn');
+  if (!wrapper || !btn) return;
+
+  function toggle(e) {
+    if (e) e.stopPropagation();
+    const isOpen = wrapper.classList.toggle('show');
+    btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+
+  btn.addEventListener('click', toggle);
+  btn.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    toggle(e);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target) && !btn.contains(e.target)) {
+      wrapper.classList.remove('show');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Закрытие по Esc, если фокус внутри списка
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && wrapper.classList.contains('show')) {
+      wrapper.classList.remove('show');
+      btn.setAttribute('aria-expanded', 'false');
+      btn.focus();
+    }
+  });
+})();
