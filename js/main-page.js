@@ -344,6 +344,7 @@ function deactivateAllZones() {
       document.body.classList.add('zone-hovered--poetry');
     }
   });
+  console.log('deactivated');
 }
 
 (function initDeepLinking() {
@@ -361,6 +362,7 @@ function deactivateAllZones() {
     if (btnCraft) {
       btnCraft.addEventListener('click', (e) => {
         e.stopPropagation();
+        console.log('craft clicked');
         const isActive = document.body.classList.contains('active-craft');
         if (isActive) {
           deactivateAllZones();
@@ -373,6 +375,7 @@ function deactivateAllZones() {
     if (btnPoetry) {
       btnPoetry.addEventListener('click', (e) => {
         e.stopPropagation();
+        console.log('poetry clicked');
         const isActive = document.body.classList.contains('active-poetry');
         if (isActive) {
           deactivateAllZones();
